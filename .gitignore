@@ -1,0 +1,10 @@
+# QA render artifacts (large, not needed for the live site)
+_review/
+
+# Python bytecode from the build scripts
+__pycache__/
+*.pyc
+
+# OS junk
+.DS_Store
+Thumbs.db
