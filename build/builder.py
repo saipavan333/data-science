@@ -296,3 +296,54 @@ def placeholder_body(meta, track_title, outline):
         'example, key points, a quiz, practice with worked solutions, and a deep dive. '
         'It is shown here so you can see the whole journey end to end.</p></div>'
         + (('<h2>What this lesson will cover</h2><ul>%s</ul>' % items) if items else ''))
+
+
+# ---------------------------------------------------------------------------
+# INTERACTIVE LAB ENGINE
+# The learner edits real code, runs it in-browser (Pyodide + sqlite3), and is
+# checked against an expected result that is COMPUTED HERE by executing the
+# reference solution at build time — so a lab can never ship a wrong answer.
+# ---------------------------------------------------------------------------
+
+def _sql_canon(setup, sql):
+    """Run `sql` against `setup` and return a canonical serialization of the rows."""
+    import sqlite3
+    db = sqlite3.connect(":memory:")
+    db.executescript(setup)
+    rows = db.execute(sql).fetchall()
+    def c(v):
+        if v is None:
+            return ""
+        if isinstance(v, float) and v == int(v):
+            return str(int(v))
+        return str(v)
+    return ";".join("|".join(c(v) for v in r) for r in rows)
+
+def lab(task, setup, solution, starter="", hint="", title="Your turn", explain=""):
+    """An interactive SQL lab. `solution` is executed now to derive the expected answer."""
+    expected = _sql_canon(setup, solution)          # raises at build time if the solution is wrong
+    starter = starter or "-- write your query here\nSELECT "
+    sol_block = ('<div class="lab-solcode"><pre><code>%s</code></pre></div>%s'
+                 % (esc(solution.strip()), ("<p>%s</p>" % inline(explain)) if explain else ""))
+    return (
+      '<div class="lab" data-setup="%s" data-expected="%s">'
+      '<div class="lab-head"><span class="lab-badge">&#9670; LAB</span>'
+      '<span class="lab-title">%s</span>'
+      '<span class="lab-state" aria-live="polite"></span></div>'
+      '<div class="lab-task">%s</div>'
+      '<div class="lab-editor"><textarea class="lab-code" spellcheck="false" rows="7">%s</textarea></div>'
+      '<div class="lab-actions">'
+      '<button class="lab-btn lab-run">&#9654; Run</button>'
+      '<button class="lab-btn primary lab-check">Check my answer</button>'
+      '<button class="lab-btn ghost lab-hint-btn">Hint</button>'
+      '<button class="lab-btn ghost lab-sol-btn">Solution</button>'
+      '<button class="lab-btn ghost lab-reset">Reset</button>'
+      '</div>'
+      '<div class="lab-msg"></div>'
+      '<div class="lab-out"><div class="cc-out-label">Your result</div><pre></pre></div>'
+      '<div class="lab-reveal lab-hint" hidden><b>Hint.</b> %s</div>'
+      '<div class="lab-reveal lab-sol" hidden><b>Reference solution.</b>%s</div>'
+      '</div>'
+      % (attresc(setup), attresc(expected), esc(title), fmt(task), esc(starter),
+         inline(hint or "Re-read the task and check which clause each requirement belongs in."),
+         sol_block))

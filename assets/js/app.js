@@ -34,6 +34,7 @@
     setupKeys();
     setupRevise();
     setupHero();
+    setupLabs();
     window.scrollTo(0, 0);
   });
 
@@ -463,4 +464,101 @@
       pre.textContent = (err && err.message ? err.message : String(err)) + "\n\nTip: open the matching notebook in /notebooks to run this locally.";
     }).then(function () { btn.disabled = false; btn.innerHTML = orig; });
   }
+
+  /* --------------------------- Interactive labs -------------------------- */
+  var LAB_HARNESS = [
+    "import sqlite3",
+    "db = sqlite3.connect(':memory:')",
+    "db.executescript(SETUP)",
+    "cur = db.execute(USER_SQL)",
+    "cols = [c[0] for c in cur.description] if cur.description else []",
+    "rows = cur.fetchall()",
+    "def _c(v):",
+    "    if v is None: return ''",
+    "    if isinstance(v, float) and v == int(v): return str(int(v))",
+    "    return str(v)",
+    "if cols:",
+    "    w = [max(len(_c(x)) for x in [cols[i]] + [r[i] for r in rows]) for i in range(len(cols))]",
+    "    print('  '.join(cols[i].ljust(w[i]) for i in range(len(cols))))",
+    "    print('  '.join('-'*n for n in w))",
+    "    for r in rows:",
+    "        print('  '.join(_c(v).ljust(w[i]) for i, v in enumerate(r)))",
+    "    if not rows:",
+    "        print('(query ran, but returned no rows)')",
+    "else:",
+    "    print('(statement ran; no rows returned)')",
+    "print('__CANON__' + ';'.join('|'.join(_c(v) for v in r) for r in rows))"
+  ].join("\n");
+
+  function setupLabs() {
+    qsa(".lab").forEach(function (lab) {
+      var codeEl = qs(".lab-code", lab), starter = codeEl.value;
+      var outBox = qs(".lab-out", lab), outPre = qs(".lab-out pre", lab);
+      var msg = qs(".lab-msg", lab), state = qs(".lab-state", lab);
+      var setup = lab.getAttribute("data-setup"), expected = lab.getAttribute("data-expected");
+      function setMsg(kind, html) { msg.className = "lab-msg show " + kind; msg.innerHTML = html; }
+
+      function exec(after) {
+        var btns = qsa(".lab-btn", lab);
+        btns.forEach(function (b) { b.disabled = true; });
+        setMsg("info", "Running your query…");
+        outBox.classList.add("show"); outPre.textContent = "";
+        loadPyodideOnce(function (t) { outPre.textContent = t; }).then(function (py) {
+          var buf = "";
+          py.setStdout({ batched: function (s) { buf += s + "\n"; } });
+          py.setStderr({ batched: function (s) { buf += s + "\n"; } });
+          py.globals.set("SETUP", setup);
+          py.globals.set("USER_SQL", codeEl.value);
+          try {
+            py.runPython(LAB_HARNESS);
+          } catch (e) {
+            outPre.textContent = String((e && e.message) || e);
+            setMsg("no", "<b>That query didn't run.</b> Read the error above — it usually names the exact word SQL tripped on.");
+            state.textContent = ""; state.className = "lab-state";
+            return null;
+          }
+          var canon = null, vis = [];
+          buf.split("\n").forEach(function (l) {
+            if (l.indexOf("__CANON__") === 0) canon = l.slice(9); else vis.push(l);
+          });
+          outPre.textContent = vis.join("\n").replace(/\s+$/, "");
+          return canon;
+        }).then(function (canon) {
+          if (canon !== null && canon !== undefined) after(canon);
+        }).catch(function (e) {
+          outPre.textContent = String((e && e.message) || e);
+          setMsg("no", "Could not start the Python runtime (it needs an internet connection the first time).");
+        }).then(function () {
+          btns.forEach(function (b) { b.disabled = false; });
+        });
+      }
+
+      qs(".lab-run", lab).addEventListener("click", function () {
+        exec(function () { setMsg("info", "Ran. Compare it against the task, then press <b>Check my answer</b>."); });
+      });
+      qs(".lab-check", lab).addEventListener("click", function () {
+        exec(function (canon) {
+          if (canon === expected) {
+            setMsg("ok", "<b>✓ Correct.</b> Your result matches exactly — that's the real answer, not a lookup. Well done.");
+            state.textContent = "✓ solved"; state.className = "lab-state ok";
+          } else {
+            setMsg("no", "<b>Not yet.</b> The query ran, but the rows don't match what the task asked for. Check three things: the <b>columns</b> you selected, the <b>filter</b>, and the <b>sort order</b>. Hint and Solution are below when you want them.");
+            state.textContent = "keep going"; state.className = "lab-state no";
+          }
+        });
+      });
+      qs(".lab-hint-btn", lab).addEventListener("click", function () {
+        var h = qs(".lab-hint", lab); h.hidden = !h.hidden;
+      });
+      qs(".lab-sol-btn", lab).addEventListener("click", function () {
+        var v = qs(".lab-sol", lab); v.hidden = !v.hidden;
+      });
+      qs(".lab-reset", lab).addEventListener("click", function () {
+        codeEl.value = starter; outBox.classList.remove("show");
+        msg.className = "lab-msg"; msg.innerHTML = "";
+        state.textContent = ""; state.className = "lab-state";
+      });
+    });
+  }
+
 })();

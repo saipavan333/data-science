@@ -127,6 +127,46 @@ run("SELECT DISTINCT country FROM customers ORDER BY country")
 ''')
 p.append(B.code_example(_c,_o,filename="order_distinct.py"))
 
+
+LAB_DB = """
+CREATE TABLE customers (id INTEGER, name TEXT, country TEXT, spend REAL, plan TEXT);
+INSERT INTO customers VALUES
+ (1,'Ada','US',240,'pro'),(2,'Blake','US',95,NULL),(3,'Chen','CA',220,'pro'),
+ (4,'Diego','MX',130,'free'),(5,'Priya','CA',510,'pro'),(6,'Sara','US',180,NULL),
+ (7,'Tom','UK',60,'free'),(8,'Wei','CA',300,'pro');
+"""
+
+p.append(B.h2("Your turn — write the queries yourself", kicker="Interactive lab"))
+p.append(B.concept(
+ "Reading SQL and *writing* SQL are different skills, and only one of them gets you hired. These labs "
+ "run a **real database inside your browser**: type a query, press **Run** to see your rows, then "
+ "**Check my answer** to compare them against the correct result. Nothing is graded by matching "
+ "keywords &mdash; your actual returned rows have to match. Get it wrong as many times as you like; "
+ "that is how it sticks."))
+p.append(B.lab(
+ "Return the **name** and **spend** of customers in the **US or Canada** who spent **more than 200**, "
+ "biggest spender first.",
+ LAB_DB,
+ "SELECT name, spend FROM customers WHERE country IN ('US','CA') AND spend > 200 ORDER BY spend DESC",
+ starter="-- table: customers(id, name, country, spend, plan)\nSELECT ",
+ hint="Two conditions joined by `AND`: one uses `IN ('US','CA')`, the other is a plain `>`. "
+      "Then sort with `ORDER BY spend DESC`.",
+ title="Lab 1 — filter, then sort",
+ explain="`IN` covers both countries in one clause, `AND` adds the spend test, and `DESC` puts the "
+         "biggest first."))
+p.append(B.lab(
+ "Now the trap you just learned. Return the **name** and **plan** of every customer who is **not on "
+ "the 'pro' plan** &mdash; and it must **include** the two customers whose plan is missing. Sort by "
+ "name.",
+ LAB_DB,
+ "SELECT name, plan FROM customers WHERE plan IS NULL OR plan != 'pro' ORDER BY name",
+ starter="-- careful: two customers have a NULL plan\nSELECT ",
+ hint="Writing only `plan != 'pro'` silently drops the NULL rows, because `NULL != 'pro'` is "
+      "*unknown*, not true. You must allow them explicitly with `plan IS NULL OR ...`.",
+ title="Lab 2 — don't lose the NULLs",
+ explain="This is the single most common SQL bug in the wild: the `IS NULL` branch is what rescues "
+         "the rows that a plain inequality throws away."))
+
 p.append(B.table(
  ["Operator", "Means", "Example"],
  [["`AND` / `OR` / `NOT`", "combine conditions (AND binds first)", "`a > 5 AND (b = 1 OR c = 1)`"],
