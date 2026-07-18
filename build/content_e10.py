@@ -21,7 +21,7 @@ p.append(B.concept(
  "- **Visually** &mdash; a boxplot shows points beyond its whiskers; a scatter plot exposes points "
  "off the cloud. Always look first.\n"
  "- The ~IQR rule~ &mdash; flag anything below Q1&minus;1.5&times;IQR or above Q3+1.5&times;IQR "
- "(the boxplot's fence, from Lesson 1.3). Robust, since it's based on quartiles, not the mean.\n"
+ "(the boxplot's fence, from Lesson 4.2). Robust, since it's based on quartiles, not the mean.\n"
  "- The ~z-score rule~ &mdash; flag points more than ~3 standard deviations from the mean "
  "(|z| &gt; 3). Simple, but assumes a roughly normal spread and is itself distorted by extreme "
  "outliers.\n"
@@ -174,8 +174,8 @@ p.append(B.deepdive(
   "**Multivariate outliers hide from one-variable rules.** A point can be perfectly normal on "
   "every single variable yet bizarre in *combination* &mdash; a 7-foot-tall person weighing 100 "
   "pounds is ordinary on height alone and weight alone, but the pair is an outlier. One-dimensional "
-  "IQR/z-score checks miss these; you need scatter plots, pair plots (Lesson 3.9), or methods "
-  "built for it (Mahalanobis distance, isolation forests in Track 4). It's a reminder that EDA "
+  "IQR/z-score checks miss these; you need scatter plots, pair plots (Lesson 5.9), or methods "
+  "built for it (Mahalanobis distance, isolation forests in Track 8). It's a reminder that EDA "
   "must look at variables *together*, not just one at a time."),
  title="Deep dive: robust statistics, winsorizing vs. trimming, and multivariate outliers"))
 

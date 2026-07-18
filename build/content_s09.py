@@ -34,7 +34,7 @@ p.append(B.concept(
  "Two quantities turn 'is this surprising?' into a number:\n\n"
  "- The ~test statistic~ measures how far your data falls from what H&#8320; predicts, in units "
  "of standard error. A statistic of 2.5 means 'your result is 2.5 standard errors away from "
- "no-effect' &mdash; the same z-score idea from Lesson 1.5.\n"
+ "no-effect' &mdash; the same z-score idea from Lesson 4.4.\n"
  "- The ~p-value~ is the punchline: **the probability of seeing data at least as extreme as "
  "yours, if H&#8320; were true.** Small p-value &rarr; your result would be a freak event under "
  "no-effect &rarr; doubt is cast on H&#8320;."))
@@ -68,7 +68,7 @@ p.append(B.figure(IMG+"s9_power.png",
  "**Significance vs. power.** Move the critical line left and you catch more real effects (more "
  "power) but raise false positives (more &alpha;); move it right and the reverse. More data is "
  "what lets you reduce *both* &mdash; the deep reason experiments need enough sample size "
- "(Track 5).",
+ "(Track 6).",
  "Two distributions showing the trade-off between alpha and power."))
 
 p.append(B.h2("Settle the Lesson 1.1 question", kicker="Worked example"))
@@ -104,7 +104,7 @@ p.append(B.concept(
  "truly equal. We reject H&#8320;: button B's lift is **statistically significant**. Notice what "
  "we did *not* claim &mdash; that B is *hugely* better, or that we're 98.8% sure it's better. We "
  "claimed exactly one thing: chance alone is an unlikely explanation. (Whether a ~0.9-point lift "
- "is worth shipping is a business question &mdash; that's Track 5.)"))
+ "is worth shipping is a business question &mdash; that's Track 6.)"))
 
 p.append(B.keypoints([
  "Hypothesis testing assumes the ~null~ (H&#8320;: no effect) and asks whether the data is "
@@ -180,7 +180,7 @@ p.append(B.practice([
   "sol":"About **1** (20 × 0.05 = 1). Even with no real effect anywhere, a 5% false-positive rate "
         "means roughly one in twenty tests will look significant by chance. Lesson: if you run "
         "many tests (or peek repeatedly), some will 'hit' purely by luck &mdash; this is the "
-        "multiple-comparisons problem, and it's why disciplined experimentation (Track 5) corrects "
+        "multiple-comparisons problem, and it's why disciplined experimentation (Track 6) corrects "
         "for it."},
 ]))
 
@@ -202,7 +202,7 @@ p.append(B.deepdive(
   "**The &alpha;–power trade-off and sample size.** Lowering &alpha; cuts false positives "
   "but, holding data fixed, raises false negatives (lower power). The only way to improve both at "
   "once is more data &mdash; which is precisely why experiments need a sample-size calculation "
-  "*before* launch. We'll do that math in Track 5 (Experimentation & A/B Testing)."),
+  "*before* launch. We'll do that math in Track 6 (Experimentation & A/B Testing)."),
  title="Deep dive: one- vs. two-sided tests, significance ≠ importance, and the α–power trade-off"))
 
 p.append(B.callout("note","Interview-ready",

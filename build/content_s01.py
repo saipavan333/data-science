@@ -69,11 +69,11 @@ p.append(B.h2("How this course is built", kicker="Your path"))
 p.append(B.concept(
     "The eleven tracks aren't a random pile of topics — they're stacked so each one rests on the "
     "one before it. Roughly, they map onto the workflow you just saw:\n\n"
-    "- **Get & clean data** &rarr; Track 2 (Python, NumPy & Pandas).\n"
-    "- **Explore** &rarr; Track 3 (EDA & Visualization), powered by Track 1 (Statistics).\n"
-    "- **Model / test** &rarr; Tracks 4–8 (Machine Learning, A/B Testing, Feature Engineering, "
+    "- **Get & clean data** &rarr; Track 1 (Python, NumPy & Pandas).\n"
+    "- **Explore** &rarr; Track 5 (EDA & Visualization), powered by Track 4 (Statistics).\n"
+    "- **Model / test** &rarr; Tracks 8–8 (Machine Learning, A/B Testing, Feature Engineering, "
     "Evaluation, Causal Inference).\n"
-    "- **Interpret & decide** &rarr; Track 9 (Communication), then Tracks 10–11 (Interview "
+    "- **Interpret & decide** &rarr; Track 12 (Communication), then Tracks 14–11 (Interview "
     "prep and Capstones) prove you can do the whole loop yourself.\n\n"
     "We begin with **Statistics & Probability** because it is the language every later track "
     "speaks. Build it solid here and everything above it gets easier."))
@@ -165,7 +165,7 @@ p.append(B.deepdive(
         "A useful way to see it: statistics asks *\"what can I conclude, and how sure am I?\"*; "
         "machine learning asks *\"what's the most accurate prediction I can make?\"* The best "
         "data scientists fluently switch between the two mindsets depending on whether the goal "
-        "is **understanding** or **prediction** — a theme we'll return to in Tracks 4 and 8."),
+        "is **understanding** or **prediction** — a theme we'll return to in Tracks 8 and 8."),
     title="Deep dive: statistics vs. analysis vs. ML vs. data science"))
 
 # --------------------------------------------------- interview ------------ #

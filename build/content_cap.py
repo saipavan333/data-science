@@ -7,7 +7,7 @@ p.append(B.why(
     "This is where it all comes together. A stakeholder hands you a year of raw, messy orders and "
     "asks a simple question: *where should we focus next year?* Your job is to turn that "
     "spreadsheet into a defensible recommendation. We will walk the full workflow from Lesson 1.1 "
-    "&mdash; load, clean, explore, visualize, decide &mdash; using everything from Track 1. Every "
+    "&mdash; load, clean, explore, visualize, decide &mdash; using everything from Track 4. Every "
     "number below is computed from real data, and the whole thing runs."))
 
 p.append(B.callout("tip",
@@ -21,7 +21,7 @@ p.append(B.callout("tip",
 p.append(B.h2("The dataset", kicker="Step 0 · know your data"))
 p.append(B.concept(
     "We have one row per order from a fictional online retailer for the 2025 calendar year. "
-    "Before touching it, write down what each column *should* be (Lesson 1.2) &mdash; it tells you "
+    "Before touching it, write down what each column *should* be (Lesson 4.1) &mdash; it tells you "
     "which summaries will be legal later."))
 p.append(B.table(
     ["Column", "Meaning", "Variable type"],
@@ -104,7 +104,7 @@ p.append(B.callout("warn", "Defend every cleaning choice",
 # ---- step 3 explore ---- #
 p.append(B.h2("Explore — the headline numbers", kicker="Step 3"))
 p.append(B.concept(
-    "Now we aggregate (Lesson 1.3). Notice we report the **median** order value next to the mean, "
+    "Now we aggregate (Lesson 4.2). Notice we report the **median** order value next to the mean, "
     "because order value is right-skewed &mdash; exactly the trap from the summary-statistics lesson."))
 p.append(B.code_example(
 '''gross = df.order_value.sum()
@@ -169,7 +169,7 @@ p.append(B.callout("why", "The one-paragraph insight a stakeholder can act on",
     "demand.", "&#9678;"))
 p.append(B.note(
     "Notice the recommendation is **specific, quantified, and actionable**, and it names the next "
-    "step: a controlled experiment (Track 5) on a sizing-guide change would prove the return-rate "
+    "step: a controlled experiment (Track 6) on a sizing-guide change would prove the return-rate "
     "effect *causally* rather than by correlation. That is how an analysis becomes a decision."))
 
 p.append(B.keypoints([
@@ -180,7 +180,7 @@ p.append(B.keypoints([
     "**Every cleaning choice is defensible or it's wrong** &mdash; drop errors, but keep real rows "
     "(label missing values rather than deleting them).",
     "Skewed money data &rarr; report the **median**; the mean overstates the 'typical' order "
-    "(Lesson 1.3 in the wild).",
+    "(Lesson 4.2 in the wild).",
     "Give each chart **one message in its title**, and connect findings to a **next step** "
     "(here: an A/B test).",
 ]))
@@ -210,7 +210,7 @@ p.append(B.quiz([
         {"t": "Order value is right-skewed, so a few large orders pull the mean above what most "
               "customers actually spend",
          "correct": True,
-         "why": "Exactly the Lesson 1.3 point on real data. With a right skew the mean is inflated "
+         "why": "Exactly the Lesson 4.2 point on real data. With a right skew the mean is inflated "
                 "by the long tail; the median better reflects the typical order."},
         {"t": "The median is always larger than the mean, so it looks better",
          "why": "Here the median ($94) is *smaller* than the mean ($161). The choice is about "
@@ -228,7 +228,7 @@ p.append(B.quiz([
               "that returns correlate with Apparel",
          "correct": True,
          "why": "Correct. EDA reveals patterns and associations; a randomized experiment is what "
-                "lets you claim the intervention *caused* the improvement (the bridge to Tracks 5 "
+                "lets you claim the intervention *caused* the improvement (the bridge to Tracks 6 "
                 "and 8)."},
         {"t": "A prettier chart of the same numbers",
          "why": "The value isn't presentation &mdash; it's moving from correlation to a tested "

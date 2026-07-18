@@ -40,7 +40,7 @@ p.append(B.pitfall(
  "Two missing-data traps. First, **don't blanket-drop** rows with any NaN (`dropna()` on a wide "
  "table can delete most of your data and bias the rest). Second, **don't impute before splitting "
  "for modeling** &mdash; filling with a mean computed over the whole dataset leaks information "
- "from the test set into training (a Track 7 theme). Match the remedy to the cause, and do it at "
+ "from the test set into training (a Track 10 theme). Match the remedy to the cause, and do it at "
  "the right time.", "&#10007;"))
 
 p.append(B.h2("Types, duplicates, outliers, and strings", kicker="Concept · the usual suspects"))
@@ -161,7 +161,7 @@ p.append(B.practice([
       "dataset can be a problem when you're about to build a predictive model.",
   "sol":"It causes **data leakage**: the mean uses information from rows that will become your "
         "test set, so the test data secretly influences the training features. Your model then "
-        "looks better in validation than it will in production. The fix (Track 7) is to compute "
+        "looks better in validation than it will in production. The fix (Track 10) is to compute "
         "imputation values on the **training split only** and apply them to validation/test &mdash; "
         "typically inside a pipeline so it happens automatically per fold."},
 ]))

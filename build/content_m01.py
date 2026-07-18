@@ -39,7 +39,7 @@ p.append(B.concept(
 p.append(B.figure(IMG+"s_ml_map.png",
  "**The map of classical ML.** Supervised (you have the answers) divides into regression "
  "(numbers) and classification (categories); unsupervised (no answers) into clustering and "
- "dimensionality reduction. This course's Track 4 covers all four.",
+ "dimensionality reduction. This course's Track 8 covers all four.",
  "Tree diagram of machine learning into supervised (regression, classification) and unsupervised "
  "(clustering, dimensionality reduction)."))
 
@@ -195,7 +195,7 @@ p.append(B.practice([
   "sol":"Repeatedly tuning against the test set **leaks** it into the modeling process: by "
         "selecting whatever happened to score best on those specific rows, they've fit to the "
         "test set's noise, so 95% is optimistically biased and won't hold on genuinely new data. "
-        "They should tune on a **validation** set (or via cross-validation, Lesson 4.7) and touch "
+        "They should tune on a **validation** set (or via cross-validation, Lesson 8.7) and touch "
         "the **test set only once**, at the very end, for a single honest estimate."},
 ]))
 
@@ -213,16 +213,16 @@ p.append(B.deepdive(
   "too few examples to pin down the real pattern, so it latches onto noise. Adding data gives it "
   "less room to wiggle and pulls the test score up toward the training score. When you can't get "
   "more data, you constrain the model instead &mdash; simpler models, ~regularization~ (penalizing "
-  "complexity, Track 4/6), or ~ensembling~ (averaging many models, Lesson 4.4) &mdash; all ways to "
+  "complexity, Track 8/9), or ~ensembling~ (averaging many models, Lesson 8.4) &mdash; all ways to "
   "reduce variance without raising bias too much.") +
  B.concept(
-  "**ML vs. statistics &mdash; two cultures, one toolbox.** Classical statistics (Track 1) "
+  "**ML vs. statistics &mdash; two cultures, one toolbox.** Classical statistics (Track 4) "
   "emphasizes *understanding* and *inference*: which factors matter, with what uncertainty, "
   "under stated assumptions. Machine learning emphasizes *prediction*: the most accurate output, "
   "judged by held-out performance, often with less concern for interpretability. They overlap "
   "heavily (linear regression lives in both worlds), and the best data scientists switch between "
   "the 'explain it' and 'predict it' mindsets depending on the goal &mdash; a theme we'll revisit "
-  "in causal inference (Track 8)."),
+  "in causal inference (Track 7)."),
  title="Deep dive: the bias–variance decomposition, curing variance, and ML vs. statistics"))
 
 p.append(B.callout("note","Interview-ready",

@@ -3,7 +3,7 @@ import builder as B
 p=[]
 
 p.append(B.why(
- "Track 2 gave you the daily tools; this lesson is your **self-test and interview prep** for "
+ "Track 1 gave you the daily tools; this lesson is your **self-test and interview prep** for "
  "them. Data-science interviews almost always include hands-on data manipulation &mdash; in "
  "**Pandas**, **SQL**, or both &mdash; because they're what the job actually is. Cover each "
  "question, answer it, then reveal the model answer. The SQL&harr;Pandas table below is worth "
@@ -129,10 +129,10 @@ p.append(B.quiz([
           "reinventing them slower and with more bugs."}]},
 ]))
 
-p.append(B.callout("note","You've finished Track 2",
+p.append(B.callout("note","You've finished Track 1",
  "You can now load, clean, reshape, and aggregate real data in Python &mdash; and translate "
- "fluently to SQL. Combined with Track 1's statistical judgment, you have the two halves every "
- "data scientist needs: the **thinking** and the **tooling**. Next up, **Track 3 (EDA &amp; "
+ "fluently to SQL. Combined with Track 4's statistical judgment, you have the two halves every "
+ "data scientist needs: the **thinking** and the **tooling**. Next up, **Track 5 (EDA &amp; "
  "Visualization)** puts them together to explore data and tell the truth with charts.",
  "&#9670;"))
 

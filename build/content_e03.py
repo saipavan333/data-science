@@ -168,7 +168,7 @@ p.append(B.deepdive(
   "*fragile*. The moment a smart stakeholder spots a truncated axis or a cherry-picked window, "
   "they stop trusting not just the chart but you and your whole analysis. Honest visualization is "
   "how a data scientist builds the credibility that makes their recommendations actually move "
-  "decisions (the entire point of Track 9)."),
+  "decisions (the entire point of Track 12)."),
  title="Deep dive: data-ink, the lie factor, and the zero-baseline nuance"))
 
 p.append(B.callout("note","Interview-ready",

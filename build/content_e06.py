@@ -171,7 +171,7 @@ p.append(B.deepdive(
   "x, y, color (hue), size, facet. Once you think in those mappings ('put time on x, revenue on "
   "y, region on color, channel on facets'), choosing and building charts becomes systematic "
   "rather than fiddly. It's the same column-to-channel thinking behind the perception ranking "
-  "from Lesson 3.3."),
+  "from Lesson 5.3."),
  title="Deep dive: pyplot vs. object-oriented, saving figures, and the grammar of graphics"))
 
 p.append(B.callout("note","Interview-ready",

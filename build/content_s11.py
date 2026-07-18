@@ -69,8 +69,8 @@ p.append(B.concept(
  "There are three ways a correlation can fool you: a ~confounder~ drives both (above); ~reverse "
  "causation~ (maybe Y causes X, not X causes Y); or pure ~coincidence~ (with enough variables, "
  "some will correlate by chance &mdash; 'spurious correlations'). Establishing real causation "
- "needs more than a correlation &mdash; ideally a randomized experiment (Track 5) or careful "
- "causal methods (Track 8). For now, the discipline is simply: **never write 'causes' when all "
+ "needs more than a correlation &mdash; ideally a randomized experiment (Track 6) or careful "
+ "causal methods (Track 7). For now, the discipline is simply: **never write 'causes' when all "
  "you have is 'correlates.'**"))
 
 p.append(B.h2("Measure it in code", kicker="Worked example"))
@@ -98,7 +98,7 @@ p.append(B.code_example(_c,_o,filename="correlation.py"))
 p.append(B.concept(
  "The U-shape is the punchline: a strong, obvious relationship that *both* coefficients score near "
  "zero. No single correlation number can be trusted without a picture &mdash; which is why every "
- "EDA (Track 3) starts with scatterplots."))
+ "EDA (Track 5) starts with scatterplots."))
 
 p.append(B.keypoints([
  "~Pearson's r~ (&minus;1 to +1) measures **linear** association: sign = direction, magnitude = "
@@ -108,7 +108,7 @@ p.append(B.keypoints([
  "**Always plot.** Anscombe's quartet proves identical summary stats can hide wildly different "
  "data.",
  "**Correlation &ne; causation.** Beware ~confounders~, reverse causation, and coincidence.",
- "Proving causation needs experiments (Track 5) or causal methods (Track 8) &mdash; not a "
+ "Proving causation needs experiments (Track 6) or causal methods (Track 7) &mdash; not a "
  "correlation coefficient.",
 ]))
 
@@ -194,9 +194,9 @@ p.append(B.deepdive(
   "a striking scatterplot found after the fact.") +
  B.concept(
   "**The road to causation.** To move from 'correlates' to 'causes' you need to rule out "
-  "confounders and reverse causation. The gold standard is a ~randomized experiment~ (Track 5): "
+  "confounders and reverse causation. The gold standard is a ~randomized experiment~ (Track 6): "
   "randomly assigning the treatment breaks the link to confounders. When you can't experiment, "
-  "~causal inference~ methods (Track 8) &mdash; controlling for confounders, matching, "
+  "~causal inference~ methods (Track 7) &mdash; controlling for confounders, matching, "
   "difference-in-differences &mdash; get you closer. This lesson is the doorway to both."),
  title="Deep dive: r-squared, spurious correlations, and the path from correlation to causation"))
 

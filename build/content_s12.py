@@ -7,7 +7,7 @@ p.append(B.why(
  "CLT, estimation, testing, and correlation. This lesson is your **self-test and interview prep**: "
  "the exact questions data-science teams ask to probe statistical maturity, with model answers. "
  "Cover the question, answer it out loud, then reveal the model answer and compare. If you can do "
- "that for every item here, Track 1 has done its job."))
+ "that for every item here, Track 4 has done its job."))
 
 p.append(B.callout("tip","How statistics shows up in DS interviews",
  "Statistics appears in three places: rapid **concept checks** ('explain a p-value'), **applied "
@@ -104,7 +104,7 @@ p.append(B.practice([
         "(smaller effect &rarr; more users, because error falls only as 1/&radic;n), the "
         "**variability** of the metric (noisier &rarr; more users), the **significance level "
         "&alpha;**, and the **power** you want (typically 80%). To halve the detectable effect you "
-        "need ~4&times; the data. (The exact formula is Track 5.)"},
+        "need ~4&times; the data. (The exact formula is Track 6.)"},
 ]))
 
 p.append(B.keypoints([
@@ -170,10 +170,10 @@ p.append(B.quiz([
           "experiment/test with a CI answers it; ML is unnecessary."}]},
 ]))
 
-p.append(B.callout("note","You've finished Track 1",
+p.append(B.callout("note","You've finished Track 4",
  "If you can answer this bank out loud, you have the statistical foundation that the other ten "
  "tracks build on &mdash; and that data-science interviews are really testing. From here, "
- "**Track 2 (Python, NumPy &amp; Pandas)** turns these ideas into hands-on data skills, and the "
+ "**Track 1 (Python, NumPy &amp; Pandas)** turns these ideas into hands-on data skills, and the "
  "**capstone** lets you run a full analysis end to end. Well done &mdash; this is the hard part, "
  "and you've done it.", "&#9670;"))
 

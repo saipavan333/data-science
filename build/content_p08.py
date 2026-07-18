@@ -18,7 +18,7 @@ p.append(B.h2("A string is a sequence of characters", kicker="Concept"))
 p.append(B.concept(
  "A ~string~ (`str`) behaves like a read-only list of characters: you index it (`word[0]`), slice "
  "it (`word[0:4]`), and check length with `len`. The same 0-based, stop-excluded rules from "
- "Lesson 2.1 apply, including negative indices from the end."))
+ "Lesson 1.2 apply, including negative indices from the end."))
 p.append(B.figure(IMG+"s_py_string_anatomy.png",
  "**Indexing and slicing a string.** Positions run from 0; negative indices count from the end; "
  "`word[::-1]` reverses it. Strings are ~immutable~ &mdash; methods return a **new** string "
@@ -33,13 +33,13 @@ p.append(B.concept(
  "- `.replace(old, new)` swaps text; `.split(sep)` breaks a string into a list; `\"-\".join(parts)` "
  "stitches a list back together.\n"
  "- Tests: `.startswith(...)`, `.endswith(...)`, and `\"x\" in text` for containment.\n\n"
- "Combine them with f-strings (Lesson 2.1) and you can reshape almost any text."))
+ "Combine them with f-strings (Lesson 1.2) and you can reshape almost any text."))
 
 p.append(B.h2("Vectorized strings in pandas: .str", kicker="Concept · the daily tool"))
 p.append(B.concept(
  "Looping over a text column would be slow and clumsy. Instead, pandas exposes every string "
  "method through the ~.str accessor~, applying it to the **whole column at once** (vectorized, "
- "Lesson 2.5): `df[\"city\"].str.strip().str.title()` cleans an entire column in one line. "
+ "Lesson 1.6): `df[\"city\"].str.strip().str.title()` cleans an entire column in one line. "
  "`.str.contains(...)`, `.str.split(...)`, and `.str.replace(...)` are the workhorses of text "
  "cleaning, and they chain just like regular string methods."))
 
@@ -133,7 +133,7 @@ p.append(B.practice([
          filename="solution.py", runnable=False) + B.fmt(
          "`df[\"email\"].str.endswith(\".edu\")` builds a boolean mask (True for .edu addresses), "
          "and `df[mask]` keeps those rows &mdash; the text equivalent of the boolean filtering "
-         "from Lesson 2.7. Add `na=False` if the column may contain missing values.")},
+         "from Lesson 1.8. Add `na=False` if the column may contain missing values.")},
 ]))
 
 p.append(B.deepdive(

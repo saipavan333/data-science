@@ -8,7 +8,7 @@ def _run(code):
 IMG="../assets/img/"; p=[]
 
 p.append(B.why(
- "In Lesson 2.1 you met functions in miniature. As your analyses grow, two things happen: you "
+ "In Lesson 1.2 you met functions in miniature. As your analyses grow, two things happen: you "
  "find yourself **repeating the same logic**, and your code **crashes** on the one weird row you "
  "didn't expect. The cure for both is here &mdash; functions that package logic for reuse, and "
  "error handling that lets a program stumble gracefully instead of falling over. This is the leap "
@@ -59,7 +59,7 @@ p.append(B.concept(
 _c,_o=_run(r'''
 def safe_average(values, default=0.0):
     """Return the mean of values, or `default` if the list is empty."""
-    if not values:                  # an empty list is 'falsy' (Lesson 2.1)
+    if not values:                  # an empty list is 'falsy' (Lesson 1.2)
         return default
     return sum(values) / len(values)
 
@@ -147,7 +147,7 @@ p.append(B.practice([
          filename="solution.py", runnable=False) + B.fmt(
          "`int(text)` raises `ValueError` for non-numeric text and `TypeError` for `None`; catching "
          "both returns `None` for any unparseable entry, so the program continues. You'd then "
-         "decide how to handle the Nones (drop, flag, or impute &mdash; Lesson 2.9).")},
+         "decide how to handle the Nones (drop, flag, or impute &mdash; Lesson 1.10).")},
 ]))
 
 p.append(B.deepdive(

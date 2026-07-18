@@ -10,7 +10,7 @@ IMG="../assets/img/"; p=[]
 p.append(B.why(
  "Here is the single most important theorem in applied statistics. It is the reason we can put "
  "error bars on almost anything, run hypothesis tests, and trust the normal distribution even "
- "when our data is anything but normal. If Lesson 1.6 told you the sample mean wobbles, the "
+ "when our data is anything but normal. If Lesson 4.5 told you the sample mean wobbles, the "
  "~Central Limit Theorem~ tells you *exactly what shape* that wobble takes &mdash; and the answer "
  "is always the same bell."))
 

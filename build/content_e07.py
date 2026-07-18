@@ -17,7 +17,7 @@ p.append(B.why(
 p.append(B.h2("Six shapes to recognize on sight", kicker="Concept"))
 p.append(B.concept(
  "Most real distributions are a variation on six shapes. Learn to name them from a histogram:\n\n"
- "- ~Normal~ (symmetric bell): mean &asymp; median; the empirical rule applies (Lesson 1.5).\n"
+ "- ~Normal~ (symmetric bell): mean &asymp; median; the empirical rule applies (Lesson 4.4).\n"
  "- ~Right-skewed~: a long tail of large values (income, prices, wait times). Mean &gt; median; "
  "report the median.\n"
  "- ~Left-skewed~: a long tail of small values (e.g., exam scores near a ceiling). Mean &lt; "
@@ -30,7 +30,7 @@ p.append(B.concept(
 p.append(B.figure(IMG+"s_eda_shapes.png",
  "**The six shapes.** Each implies different handling: skew &rarr; prefer the median; bimodal "
  "&rarr; find the hidden subgroups; heavy-tailed &rarr; beware unstable means and plan for "
- "outliers (Lesson 3.7).",
+ "outliers (Lesson 5.7).",
  "A gallery of normal, right-skewed, left-skewed, bimodal, uniform, and heavy-tailed histograms."))
 
 p.append(B.h2("Checking normality: the QQ plot", kicker="Concept"))
@@ -118,7 +118,7 @@ p.append(B.quiz([
       "visualize its shape clearly. What's a good move?",
   "options":[
    {"t":"Report the median, and consider a log transform (or log axis) to see the shape","correct":True,
-    "why":"Correct. The median resists the long tail (Lesson 1.3), and a log transform/axis "
+    "why":"Correct. The median resists the long tail (Lesson 4.2), and a log transform/axis "
           "spreads out the bunched small values so the distribution's shape is readable."},
    {"t":"Report the mean and use a linear axis",
     "why":"The mean is inflated by the right tail (misleading as 'typical'), and a linear axis "
@@ -156,7 +156,7 @@ p.append(B.practice([
  {"q":"Why might you transform a variable before *modeling*, not just for a prettier chart?",
   "sol":"Many models (and the inference around them) assume things a skewed variable violates: "
         "linear regression assumes a roughly linear relationship and normal-ish, equal-variance "
-        "residuals (Track 4/7). Logging a right-skewed predictor or target can **linearize** a "
+        "residuals (Track 8/10). Logging a right-skewed predictor or target can **linearize** a "
         "multiplicative relationship, **stabilize the variance**, and **reduce the leverage of "
         "extreme values** &mdash; making the model fit better and its assumptions hold. (You then "
         "interpret coefficients in percentage/multiplicative terms and back-transform predictions.)"},
@@ -179,7 +179,7 @@ p.append(B.deepdive(
  B.concept(
   "**Why skew matters downstream.** Heavy right skew concentrates influence in a few huge values, "
   "which can dominate a mean, inflate a correlation, and give outliers outsized pull on a fitted "
-  "model (Lesson 3.7 and Track 4). Recognizing and, where appropriate, transforming skewed "
+  "model (Lesson 5.7 and Track 8). Recognizing and, where appropriate, transforming skewed "
   "variables during EDA prevents a cascade of misleading results later &mdash; it's cheap "
   "insurance taken early."),
  title="Deep dive: power transforms (Box–Cox), eyeballing vs. normality tests, and why skew matters"))

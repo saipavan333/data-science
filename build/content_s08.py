@@ -31,7 +31,7 @@ p.append(B.formula(
  "estimate ± (critical value × standard error). For 95% confidence and a decent sample size, "
  "t* &asymp; 1.96 — straight from the normal curve of the CLT."))
 p.append(B.concept(
- "The three ingredients each have a job: the **standard error** (Lesson 1.6) sets the natural "
+ "The three ingredients each have a job: the **standard error** (Lesson 4.5) sets the natural "
  "scale of the wobble; the **critical value** t* stretches it to the confidence you want (more "
  "confidence &rarr; wider interval); and the **estimate** centers it. Because the CLT makes "
  "x&#772; approximately normal, the 95% figure comes from the empirical rule: about 95% of a "
@@ -74,7 +74,7 @@ rng = np.random.default_rng(3)
 sample = rng.normal(42, 11, size=50)
 n      = len(sample)
 xbar   = sample.mean()
-s      = sample.std(ddof=1)          # sample SD (ddof=1 -> the n-1 from Lesson 1.3)
+s      = sample.std(ddof=1)          # sample SD (ddof=1 -> the n-1 from Lesson 4.2)
 se     = s / np.sqrt(n)              # standard error of the mean
 
 t_star = stats.t.ppf(0.975, df=n-1)  # 95% critical value from the t-distribution

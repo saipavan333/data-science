@@ -18,7 +18,7 @@ p.append(B.concept(
     "A ~random variable~ is just a number whose value is uncertain until observed — the result of "
     "a die roll, a customer's spend, tomorrow's ticket count. A distribution describes how "
     "probability is spread across that variable's possible values. There are two flavors, "
-    "matching the discrete/continuous split from Lesson 1.2:\n\n"
+    "matching the discrete/continuous split from Lesson 4.1:\n\n"
     "- For a **discrete** variable, the ~PMF~ (probability mass function) gives the probability "
     "of *each exact value*. The bar heights add up to 1.\n"
     "- For a **continuous** variable, the ~PDF~ (probability density function) is a smooth curve, "
@@ -51,7 +51,7 @@ p.append(B.tip(
     "Measuring distance in standard deviations gives the ~z-score~: z = (x &minus; &mu;) / "
     "&sigma;. A z-score of 2 means 'two SDs above the mean.' Z-scores let you compare values "
     "from totally different scales — a test score and a height — on one common ruler, and they're "
-    "the backbone of the hypothesis tests coming in Lesson 1.9."))
+    "the backbone of the hypothesis tests coming in Lesson 4.8."))
 
 # ----------------------------------------------------- binomial ----------- #
 p.append(B.h2("The binomial: counting successes", kicker="Concept · discrete #1"))
@@ -191,7 +191,7 @@ p.append(B.practice([
             "50 &times; 0.10 = **5 conversions**. The distribution is centered near 5, slightly "
             "right-skewed (since p is small and counts can't go below 0), and because n is "
             "moderately large it already looks bell-ish — foreshadowing how the binomial "
-            "approaches a normal shape, which powers the experiment math in Track 5."},
+            "approaches a normal shape, which powers the experiment math in Track 6."},
 ]))
 
 p.append(B.deepdive(
@@ -205,7 +205,7 @@ p.append(B.deepdive(
     B.concept(
         "**The distributions are secretly related.** The Poisson is the limit of the binomial "
         "when n is huge and p is tiny (many trials, rare success), with &lambda; = n&times;p — "
-        "which is why both count events. And by the Central Limit Theorem (Lesson 1.7), *sums* of "
+        "which is why both count events. And by the Central Limit Theorem (Lesson 4.6), *sums* of "
         "binomial or Poisson counts, and indeed averages of almost anything, drift toward the "
         "**normal** as the count grows. That's why the bell curve shows up everywhere: it is the "
         "natural shape of accumulated randomness.") +

@@ -28,7 +28,7 @@ p.append(B.figure(IMG+"s_eda_facets.png",
 
 p.append(B.h2("The correlation heatmap", kicker="Technique 2"))
 p.append(B.concept(
- "When you have several numeric variables, you want every pairwise ~correlation~ (Lesson 1.11) at "
+ "When you have several numeric variables, you want every pairwise ~correlation~ (Lesson 4.10) at "
  "once. A ~heatmap~ of the correlation matrix does exactly that: each cell is a pair, colored by "
  "the strength and sign of their relationship. A diverging color scale (red&ndash;blue) makes "
  "positive and negative pop, and clusters of related variables jump out."))
@@ -39,7 +39,7 @@ p.append(B.figure(IMG+"s_eda_heatmap.png",
  "A correlation heatmap of four variables with annotated coefficients."))
 p.append(B.warn(
  "A heatmap inherits all of correlation's caveats: it measures only **linear, pairwise** "
- "relationships, so it misses curves (a U-shape reads as ~0, Lesson 1.11) and says nothing about "
+ "relationships, so it misses curves (a U-shape reads as ~0, Lesson 4.10) and says nothing about "
  "causation. Use it to *spot candidates* worth a closer scatter plot &mdash; not as the final "
  "word.", "&#9650;"))
 
@@ -78,7 +78,7 @@ print(df.corr().round(2).to_string())
 p.append(B.code_example(_c,_o,filename="correlation_matrix.py"))
 p.append(B.tip(
  "To add a **third** variable to a single scatter plot, you can map it to **color** or **point "
- "size** (a 'bubble chart') &mdash; but use this sparingly: from Lesson 3.2, people read position "
+ "size** (a 'bubble chart') &mdash; but use this sparingly: from Lesson 5.2, people read position "
  "and length far better than color or area. Often two clear charts, or a faceted set, beat one "
  "overloaded chart trying to show four variables at once."))
 
@@ -168,14 +168,14 @@ p.append(B.deepdive(
   "can reverse inside every subgroup. The classic case: a treatment that looks worse overall but "
   "is better for both mild and severe patients, because severity (a confounder) is distributed "
   "unevenly. Faceting and grouped analysis are your defense &mdash; always ask whether a "
-  "confounding variable (Lesson 1.11, and all of Track 8) might be hiding inside an aggregate. "
+  "confounding variable (Lesson 4.10, and all of Track 7) might be hiding inside an aggregate. "
   "This is one of the most important reasons to look at subgroups, not just totals.") +
  B.concept(
   "**When there are too many variables to eyeball.** A pair plot of 5 variables is 25 panels; of "
   "20 variables it's 400 &mdash; unreadable. Beyond a handful of dimensions you reach for "
   "~dimensionality reduction~: techniques like ~PCA~ (principal component analysis) compress many "
   "correlated variables into a few summary axes that capture most of the variation, which you can "
-  "then plot in 2-D. It's a preview of unsupervised learning (Track 4); for now, know that "
+  "then plot in 2-D. It's a preview of unsupervised learning (Track 8); for now, know that "
   "heatmaps and pair plots are your tools up to ~10 variables, and reduction takes over above "
   "that.") +
  B.concept(

@@ -8,9 +8,9 @@ def _run(code):
 IMG="../assets/img/"; p=[]
 
 p.append(B.why(
- "Lesson 2.5 taught you to *think in arrays*. This lesson adds the array tools you'll actually "
+ "Lesson 1.6 taught you to *think in arrays*. This lesson adds the array tools you'll actually "
  "reach for every week: aggregating along a chosen direction, generating random data for "
- "simulations (the engine behind every Track 1 demo), and reshaping and transforming arrays. "
+ "simulations (the engine behind every Track 4 demo), and reshaping and transforming arrays. "
  "These are the moves behind Pandas, scikit-learn, and the statistics you've already learned "
  "&mdash; so they pay off everywhere."))
 
@@ -30,7 +30,7 @@ p.append(B.figure(IMG+"s_np_axis.png",
 p.append(B.h2("Random numbers (done right)", kicker="Concept · simulation fuel"))
 p.append(B.concept(
  "Random data drives simulations, sampling, shuffling, and the resampling behind the bootstrap "
- "(Lesson 1.8). The modern way is a ~generator~: `rng = np.random.default_rng(seed)`, then draw "
+ "(Lesson 4.7). The modern way is a ~generator~: `rng = np.random.default_rng(seed)`, then draw "
  "from it &mdash; `rng.normal(mean, sd, size)`, `rng.uniform(...)`, `rng.integers(low, high, "
  "size)`, `rng.choice(options, size)`. Passing a ~seed~ makes the 'random' numbers **reproducible**"
  ": the same seed gives the same sequence every run, which is essential for results others can "
@@ -42,7 +42,7 @@ p.append(B.concept(
  "- ~reshape~ rearranges the same data into a new shape: `a.reshape(3, 4)` (use `-1` to let NumPy "
  "infer a dimension).\n"
  "- ~where~ is a vectorized if/else: `np.where(a > 0, \"pos\", \"neg\")`.\n"
- "- ~clip~ caps values to a range: `np.clip(a, 0, 100)` (winsorizing, Lesson 3.7).\n"
+ "- ~clip~ caps values to a range: `np.clip(a, 0, 100)` (winsorizing, Lesson 5.7).\n"
  "- `np.unique`, `np.concatenate`, `np.argmax`/`np.argsort` round out the toolkit."))
 
 p.append(B.h2("Arrays in anger", kicker="Worked example"))
@@ -142,22 +142,22 @@ p.append(B.practice([
          filename="solution.py", runnable=False) + B.fmt(
          "Create a seeded generator (so the draw is reproducible), then `rng.normal(mean, sd, "
          "size)` gives 1,000 values centered at 50 with spread 8 &mdash; exactly the kind of "
-         "synthetic data the Track 1 simulations used to demonstrate the CLT and sampling.")},
+         "synthetic data the Track 4 simulations used to demonstrate the CLT and sampling.")},
 ]))
 
 p.append(B.deepdive(
  B.concept(
-  "**Broadcasting, revisited.** The axis idea and broadcasting (Lesson 2.5) team up constantly. "
+  "**Broadcasting, revisited.** The axis idea and broadcasting (Lesson 1.6) team up constantly. "
   "To standardize a table column-by-column &mdash; subtract each column's mean and divide by its "
   "SD &mdash; you write `(M - M.mean(axis=0)) / M.std(axis=0)` in one line: the per-column "
   "statistics (shape `(cols,)`) broadcast across every row. This single expression is the "
   "~z-score standardization~ that scikit-learn's `StandardScaler` performs, and a preview of "
-  "feature scaling in Track 6.") +
+  "feature scaling in Track 9.") +
  B.concept(
   "**Views vs. copies, and why reshape is cheap.** `reshape` usually returns a ~view~ &mdash; the "
   "same data seen with a different shape, no copying &mdash; which is why it's nearly free even "
   "on huge arrays. Slicing is also a view, so modifying a slice can change the original (the "
-  "array version of the reference trap from Lesson 2.1). When you need an independent array, call "
+  "array version of the reference trap from Lesson 1.2). When you need an independent array, call "
   "`.copy()`. Understanding views explains both NumPy's speed and its occasional 'why did my "
   "original change?' surprises.") +
  B.concept(

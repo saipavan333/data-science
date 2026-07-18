@@ -34,7 +34,7 @@ p.append(B.practice([
  {"q":"'You see mean income = \\$95k but median = \\$61k. What does that tell you, and how would "
       "you visualize it?'",
   "sol":"The mean far above the median signals a **right-skewed** distribution &mdash; a few very "
-        "high earners pull the mean up (Lesson 1.3). Report the **median** as 'typical.' Visualize "
+        "high earners pull the mean up (Lesson 4.2). Report the **median** as 'typical.' Visualize "
         "with a **histogram** (you'll see the long right tail) or a **boxplot** (the outliers "
         "appear beyond the upper whisker). Consider a **log scale** to make the skewed shape "
         "readable."},
@@ -63,7 +63,7 @@ p.append(B.practice([
   "sol":"Not yet &mdash; this is correlation, not causation, and likely **confounded**: big "
         "spenders may simply receive more discounts (reverse/selection), or a hidden variable "
         "(loyalty, season) drives both. I'd **facet** by customer tier to check for **Simpson's "
-        "paradox**, and ultimately propose a **randomized experiment** (Track 5) &mdash; randomly "
+        "paradox**, and ultimately propose a **randomized experiment** (Track 6) &mdash; randomly "
         "give some users a discount and compare &mdash; to establish whether discounts actually "
         "*cause* higher spend."}]))
 
@@ -124,11 +124,11 @@ p.append(B.quiz([
     "why":"That's a charting deception. The reversal across subgroups is Simpson's paradox."}]},
 ]))
 
-p.append(B.callout("note","You've finished Track 3",
+p.append(B.callout("note","You've finished Track 5",
  "You can now meet any dataset with a systematic routine, choose and draw honest charts, see many "
- "variables at once, and catch the ways charts (and aggregates) mislead. Combined with Track 1's "
- "rigor and Track 2's tooling, you can take raw data all the way to a trustworthy picture &mdash; "
- "which is exactly what the EDA capstone asks you to do. Next, **Track 4 (Classical Machine "
+ "variables at once, and catch the ways charts (and aggregates) mislead. Combined with Track 4's "
+ "rigor and Track 1's tooling, you can take raw data all the way to a trustworthy picture &mdash; "
+ "which is exactly what the EDA capstone asks you to do. Next, **Track 8 (Classical Machine "
  "Learning)** builds models on this foundation.", "&#9670;"))
 
 LESSONS={"eda-05-interview":"\n".join(p)}

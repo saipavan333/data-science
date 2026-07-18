@@ -20,9 +20,9 @@ p.append(B.concept(
  "~EDA~ is the open-ended investigation you do *before* committing to a model or a conclusion. "
  "Its three goals:\n\n"
  "- **Understand the data**: how big is it, what's each column, what's typical and what varies "
- "(everything from Track 1).\n"
+ "(everything from Track 4).\n"
  "- **Find problems**: missing values, wrong types, duplicates, impossible entries, outliers "
- "(everything from Track 2's cleaning).\n"
+ "(everything from Track 1's cleaning).\n"
  "- **Generate questions**: spot patterns and oddities that become hypotheses to test later.\n\n"
  "EDA is *exploratory* &mdash; you're looking around with an open mind, not confirming a "
  "preset answer. That openness is the point: the data often surprises you."))
@@ -45,8 +45,8 @@ p.append(B.concept(
 
 p.append(B.h2("Run the checklist on real data", kicker="Worked example"))
 p.append(B.concept(
- "Here's the routine in code, on a small orders table. Notice it's just the Track 1 summaries and "
- "Track 2 inspection tools, applied in a deliberate order &mdash; that ordering *is* the skill."))
+ "Here's the routine in code, on a small orders table. Notice it's just the Track 4 summaries and "
+ "Track 1 inspection tools, applied in a deliberate order &mdash; that ordering *is* the skill."))
 _c,_o=_run(r'''
 import pandas as pd
 
@@ -74,9 +74,9 @@ p.append(B.concept(
  "what a typical order looks like, where orders come from, and a hint of a **bivariate** pattern "
  "&mdash; the North's average order looks larger. That last line is a *question*, not a "
  "conclusion: is the difference real, or just six rows of noise? You'd answer it with the "
- "hypothesis test from Lesson 1.9. EDA hands testing its questions."))
+ "hypothesis test from Lesson 4.8. EDA hands testing its questions."))
 p.append(B.tip(
- "Numbers alone can deceive &mdash; remember Anscombe's quartet from Lesson 1.11, where four "
+ "Numbers alone can deceive &mdash; remember Anscombe's quartet from Lesson 4.10, where four "
  "datasets shared identical statistics but looked completely different. So EDA is never just "
  "`.describe()`; the moment a variable matters, **plot it**. That's exactly what the next two "
  "lessons are about."))
@@ -87,7 +87,7 @@ p.append(B.keypoints([
  "Follow the same routine every time: shape & types &rarr; missingness & duplicates &rarr; "
  "univariate &rarr; bivariate &rarr; hypotheses.",
  "~Univariate~ = one variable alone (do this first); ~bivariate~ = two variables together.",
- "EDA produces **questions to test**, not final answers &mdash; it feeds Track 1's inference.",
+ "EDA produces **questions to test**, not final answers &mdash; it feeds Track 4's inference.",
  "Summary numbers can hide the truth (Anscombe) &mdash; **always plot** what matters.",
 ]))
 
@@ -106,7 +106,7 @@ p.append(B.quiz([
           "checked data quality. Correlations on dirty or misunderstood data mislead."},
    {"t":"A polished chart for the final presentation",
     "why":"Presentation is the very last step. EDA is private investigation first; communication "
-          "(Track 9) comes after you understand the data."}]},
+          "(Track 12) comes after you understand the data."}]},
  {"q":"Why does the routine insist on **univariate** analysis before **bivariate**?",
   "options":[
    {"t":"You can't correctly interpret a relationship between two variables until you understand "
@@ -138,7 +138,7 @@ p.append(B.quiz([
           "whether this one is real, which requires testing."},
    {"t":"Correlation proves the region causes higher spend",
     "why":"This isn't even established as real yet, and even if it were, correlation isn't "
-          "causation (Lesson 1.11). It's a question to investigate."}]},
+          "causation (Lesson 4.10). It's a question to investigate."}]},
 ]))
 
 p.append(B.practice([
@@ -165,13 +165,13 @@ p.append(B.deepdive(
   "pre-specified hypothesis. The two must stay honest about which you're doing, because of a "
   "trap: if you explore freely and then run a significance test on the most striking pattern you "
   "found, the p-value is invalid &mdash; you've effectively run many implicit tests and reported "
-  "the luckiest (the multiple-comparisons problem from Lesson 1.9). Best practice: explore on "
+  "the luckiest (the multiple-comparisons problem from Lesson 4.8). Best practice: explore on "
   "the data, but confirm surprising findings on fresh data or with a pre-registered test.") +
  B.concept(
   "**Look before you compute.** It is genuinely common for a single plot to overturn a "
   "conclusion that summary statistics supported &mdash; a bimodal distribution hiding behind a "
   "mean, an outlier inflating a correlation, a trend that's really two subgroups (Simpson's "
-  "paradox, coming in Track 5). The discipline 'never trust a statistic you haven't plotted' is "
+  "paradox, coming in Track 6). The discipline 'never trust a statistic you haven't plotted' is "
   "why visualization (the next lessons) is inseparable from EDA."),
  title="Deep dive: exploratory vs. confirmatory analysis, and why you must look"))
 

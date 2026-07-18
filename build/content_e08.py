@@ -19,7 +19,7 @@ p.append(B.concept(
  "The first thing to do with a categorical column is count its values. `value_counts()` gives the "
  "tally per category; adding `normalize=True` turns those into **proportions** (shares), which "
  "are usually more meaningful than raw counts &mdash; '40% of orders are from the North' lands "
- "better than '1,203 orders.' Visualize counts with a **bar chart** (sorted, from Lesson 3.3)."))
+ "better than '1,203 orders.' Visualize counts with a **bar chart** (sorted, from Lesson 5.3)."))
 
 p.append(B.h2("Two categories: grouped vs. stacked bars", kicker="Concept · two categories"))
 p.append(B.concept(
@@ -45,7 +45,7 @@ p.append(B.figure(IMG+"s_eda_crosstab.png",
  "comparable percentages.",
  "A heatmap of order counts by region and channel."))
 p.append(B.note(
- "A crosstab is exactly the input to the ~chi-square test~ from Lesson 1.10: EDA reveals an "
+ "A crosstab is exactly the input to the ~chi-square test~ from Lesson 4.9: EDA reveals an "
  "apparent association between two categories (e.g., region and returns), and the chi-square test "
  "tells you whether it's more than chance. Explore first, then test."))
 
@@ -54,7 +54,7 @@ p.append(B.concept(
  "Some categorical columns have **hundreds or thousands** of unique values &mdash; zip code, "
  "product ID, free-text city. Plotting all of them is hopeless, and they choke many models. The "
  "standard moves: show the **top-N** and bucket the long tail into an **'Other'** category, or "
- "group by a higher level (zip &rarr; state). You'll meet more powerful encodings in Track 6, but "
+ "group by a higher level (zip &rarr; state). You'll meet more powerful encodings in Track 9, but "
  "in EDA, top-N-plus-Other keeps charts and tables readable."))
 
 p.append(B.h2("Explore categories in code", kicker="Worked example"))
@@ -92,7 +92,7 @@ p.append(B.keypoints([
  "total per group.",
  "A ~crosstab~ (`pd.crosstab`) shows the relationship between two categoricals; normalize it for "
  "**rates**, and visualize as a heatmap.",
- "A crosstab feeds the **chi-square test** (Lesson 1.10): explore the association, then test it.",
+ "A crosstab feeds the **chi-square test** (Lesson 4.9): explore the association, then test it.",
  "For **high-cardinality** columns, show **top-N + 'Other'** or roll up to a coarser level.",
 ]))
 
@@ -137,11 +137,11 @@ p.append(B.quiz([
    {"t":"Plot all 5,000 bars",
     "why":"5,000 bars is unreadable. Summarize with top-N + 'Other' or a higher-level grouping."},
    {"t":"Take the mean of product_id",
-    "why":"IDs are nominal labels (Lesson 1.2); their mean is meaningless. Summarize by frequency "
+    "why":"IDs are nominal labels (Lesson 4.1); their mean is meaningless. Summarize by frequency "
           "instead."},
    {"t":"Drop the column entirely",
     "why":"High cardinality isn't a reason to discard a potentially useful column; summarize it "
-          "(top-N/Other) or encode it later (Track 6)."}]},
+          "(top-N/Other) or encode it later (Track 9)."}]},
 ]))
 
 p.append(B.practice([
@@ -156,7 +156,7 @@ p.append(B.practice([
         "may simply have far more visitors, so more conversions even at a *lower* rate. Compute "
         "the **rate** by normalizing the crosstab within each device "
         "(`normalize='index'`), giving conversion % for Mobile vs Desktop, which is the fair "
-        "comparison. (Then a chi-square test, Lesson 1.10, checks if the difference is real.)"},
+        "comparison. (Then a chi-square test, Lesson 4.9, checks if the difference is real.)"},
 ]))
 
 p.append(B.deepdive(
@@ -168,14 +168,14 @@ p.append(B.deepdive(
   "Simpson's paradox: a relationship in a 2&times;2 crosstab can reverse once you add a third "
   "variable, so check important associations within subgroups.") +
  B.concept(
-  "**Encoding categories for models (a Track 6 preview).** Charts and crosstabs are for "
+  "**Encoding categories for models (a Track 9 preview).** Charts and crosstabs are for "
   "*understanding* categories; models need them as numbers. The main routes are ~one-hot "
   "encoding~ (a 0/1 column per category &mdash; great for low cardinality) and ~target/frequency "
   "encoding~ (replace each category with a statistic, useful for high cardinality). Knowing during "
   "EDA whether a categorical column is low- or high-cardinality tells you which encoding headache "
   "is coming &mdash; and whether you'll need the 'top-N + Other' trick first.") +
  B.concept(
-  "**Ordinal vs. nominal in charts.** If a category has a natural order (Lesson 1.2) &mdash; "
+  "**Ordinal vs. nominal in charts.** If a category has a natural order (Lesson 4.1) &mdash; "
   "S/M/L, Bronze/Silver/Gold &mdash; keep that order on the axis rather than sorting by frequency, "
   "so the chart respects the meaning. For unordered (nominal) categories, sort by value so the "
   "ranking is obvious. The right ordering is part of telling the truth with a chart."),

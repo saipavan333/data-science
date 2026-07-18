@@ -75,7 +75,7 @@ print(sales.rolling(7).mean().tail(4).round(1).to_string())
 p.append(B.code_example(_c,_o,filename="timeseries.py"))
 p.append(B.warn(
  "The cardinal rule of time data: **never shuffle it, and never let the future leak into the "
- "past.** When you later build models (Track 4/7), you must split train/test by **time** (train "
+ "past.** When you later build models (Track 8/10), you must split train/test by **time** (train "
  "on earlier data, test on later) &mdash; a random split lets the model 'see the future,' giving "
  "fantastically optimistic results that collapse in production. Respecting time order starts in "
  "EDA.", "&#9650;"))
@@ -159,7 +159,7 @@ p.append(B.deepdive(
   "+ residual) when the seasonal swing is a roughly constant size, or ~multiplicative~ (observed "
   "= trend &times; seasonal &times; residual) when the swing **grows with the level** (holiday "
   "spikes that get bigger as the business grows). A telltale sign of the multiplicative case is a "
-  "seasonal pattern that fans out over time &mdash; and a **log transform** (Lesson 3.4) converts "
+  "seasonal pattern that fans out over time &mdash; and a **log transform** (Lesson 5.4) converts "
   "it back to additive, which is one more reason logs are so useful.") +
  B.concept(
   "**Autocorrelation.** Time-series values are usually correlated with their own recent past "

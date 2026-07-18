@@ -12,7 +12,7 @@ p.append(B.why(
  "they're a notorious source of bugs, because a date that arrives as the text `\"2025-03-14\"` is "
  "useless until Python understands it as a *moment in time*. Once it does, a world opens up: pull "
  "out the month or weekday, compute how many days between two events, and roll daily data up to "
- "monthly (the time-series EDA from Track 3). This lesson makes dates your friend."))
+ "monthly (the time-series EDA from Track 5). This lesson makes dates your friend."))
 
 p.append(B.h2("Parsing: text into real dates", kicker="Concept"))
 p.append(B.concept(
@@ -62,7 +62,7 @@ p.append(B.warn(
  "The `.dt` accessor only works once the column is actually a datetime dtype &mdash; calling "
  "`.dt.month` on a column of date *strings* raises an error. The fix is always the same: "
  "`pd.to_datetime(...)` first, then check with `df.dtypes` (you want `datetime64`, not "
- "`object`). Parsing dates is part of the cleaning ritual from Lesson 2.9.", "&#9650;"))
+ "`object`). Parsing dates is part of the cleaning ritual from Lesson 1.10.", "&#9650;"))
 
 p.append(B.keypoints([
  "Dates arrive as **text**; convert with `pd.to_datetime(...)` before doing anything time-aware.",
@@ -72,7 +72,7 @@ p.append(B.keypoints([
  "`pd.Timedelta(days=n)` for date math.",
  "`.dt` requires a **datetime dtype** &mdash; check `df.dtypes` shows `datetime64`, not "
  "`object`.",
- "A datetime index unlocks `resample()` for rolling daily &rarr; monthly (Track 3 time-series).",
+ "A datetime index unlocks `resample()` for rolling daily &rarr; monthly (Track 5 time-series).",
 ]))
 
 p.append(B.quiz([
@@ -156,7 +156,7 @@ p.append(B.deepdive(
   "~Unix/epoch time~, the seconds since midnight UTC on Jan 1, 1970. You'll meet it in logs and "
   "APIs; `pd.to_datetime(values, unit=\"s\")` turns those numbers into readable dates. Knowing "
   "this demystifies the giant integers that sometimes appear in 'date' columns, and connects to "
-  "the time-series resampling and rolling tools from Track 3."),
+  "the time-series resampling and rolling tools from Track 5."),
  title="Deep dive: time zones, explicit formats & coercion, and epoch time"))
 
 p.append(B.callout("note","Interview-ready",

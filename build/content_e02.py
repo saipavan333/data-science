@@ -32,9 +32,9 @@ p.append(B.concept(
  "- ~Bar chart~ &mdash; **comparison** of a value across categories. Sort the bars unless the "
  "categories have a natural order.\n"
  "- ~Scatter plot~ &mdash; the **relationship** between two numeric variables (the picture behind "
- "correlation, Lesson 1.11).\n"
+ "correlation, Lesson 4.10).\n"
  "- ~Line chart~ &mdash; a **trend** over time (or any ordered axis).\n"
- "- ~Boxplot~ &mdash; **spread and outliers**, especially compared across groups (Lesson 1.3)."))
+ "- ~Boxplot~ &mdash; **spread and outliers**, especially compared across groups (Lesson 4.2)."))
 p.append(B.figure(IMG+"s_eda_gallery.png",
  "**The five workhorses, each answering its kind of question.** Reach for the one whose job "
  "matches your question; the fancy chart types are rarely worth the loss of clarity.",
@@ -150,7 +150,7 @@ p.append(B.practice([
       "show their distribution *and* make the outliers visible. What would you plot, and what's "
       "one adjustment that helps with the skew?",
   "sol":"Plot a **histogram** to show the distribution and/or a **boxplot** to highlight the "
-        "outliers explicitly (points beyond the whiskers, Lesson 1.3). Because the data is "
+        "outliers explicitly (points beyond the whiskers, Lesson 4.2). Because the data is "
         "right-skewed, a helpful adjustment is a **log scale** on the value axis (or plotting "
         "log(amount)), which spreads out the cluster of small orders and tames the long tail so "
         "the shape is readable."},

@@ -68,7 +68,7 @@ p.append(B.tip(
 p.append(B.h2("The trap: storage type is not variable type", kicker="Worked example"))
 p.append(B.concept(
     "Here's the mistake that bites beginners. When you load data, the tool (here, ~pandas~ — "
-    "Python's table library, which we'll learn properly in Track 2) records a **storage type**, "
+    "Python's table library, which we'll learn properly in Track 1) records a **storage type**, "
     "called a ~dtype~: is this column stored as integers, decimals, or text? That is *not* the "
     "same as the variable type you just learned. A column can be stored as integers yet be "
     "completely categorical."))
