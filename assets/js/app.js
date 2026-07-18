@@ -35,6 +35,7 @@
     setupRevise();
     setupHero();
     setupLabs();
+    setupWidgets();
     window.scrollTo(0, 0);
   });
 
@@ -558,6 +559,194 @@
         msg.className = "lab-msg"; msg.innerHTML = "";
         state.textContent = ""; state.className = "lab-state";
       });
+    });
+  }
+
+
+  /* ------------------------- Interactive widgets ------------------------ */
+  var WIDGETS = {};
+
+  /* NULL three-valued logic explorer */
+  WIDGETS["null-logic"] = function (host) {
+    var rows = [["Ada","pro"],["Blake",null],["Chen","pro"],["Diego","free"],["Sara",null],["Tom","free"]];
+    var conds = [
+      ["plan = 'pro'",      function (v) { return v === null ? null : v === "pro"; }],
+      ["plan != 'pro'",     function (v) { return v === null ? null : v !== "pro"; }],
+      ["plan IS NULL",      function (v) { return v === null; }],
+      ["plan IS NOT NULL",  function (v) { return v !== null; }]
+    ];
+    var cur = 1;
+    host.innerHTML =
+      '<div class="w-row"><span class="w-lab">WHERE</span><span class="w-seg"></span></div>' +
+      '<table class="w-tbl"><thead><tr><th>name</th><th>plan</th><th>condition evaluates to</th><th>row is</th></tr></thead><tbody></tbody></table>' +
+      '<div class="w-out"></div>';
+    var seg = qs(".w-seg", host), tb = qs("tbody", host), out = qs(".w-out", host);
+    conds.forEach(function (c, i) {
+      var b = document.createElement("button");
+      b.textContent = c[0];
+      b.addEventListener("click", function () { cur = i; render(); });
+      seg.appendChild(b);
+    });
+    function render() {
+      qsa("button", seg).forEach(function (b, i) { b.className = i === cur ? "on" : ""; });
+      var kept = 0, dropped = 0, unknown = 0;
+      tb.innerHTML = rows.map(function (r) {
+        var v = r[1], res = conds[cur][1](v);
+        var label = res === null ? "UNKNOWN" : (res ? "TRUE" : "FALSE");
+        if (res === true) kept++; else dropped++;
+        if (res === null) unknown++;
+        return '<tr class="' + (res === true ? "keep" : "drop") + (v === null ? " nullrow" : "") + '">' +
+          "<td>" + r[0] + "</td><td>" + (v === null ? "<b>NULL</b>" : "'" + v + "'") + "</td>" +
+          "<td>" + label + "</td><td>" + (res === true ? "kept" : "dropped") + "</td></tr>";
+      }).join("");
+      out.className = "w-out " + (unknown ? "unknown" : "true");
+      out.innerHTML = unknown
+        ? "<b>" + unknown + " row(s) evaluated to UNKNOWN.</b> A comparison against NULL is never true — so <code>WHERE</code> silently <b>drops</b> them. Kept " + kept + ", dropped " + dropped + ". This is the bug that quietly loses rows in real reports."
+        : "<b>Kept " + kept + ", dropped " + dropped + ".</b> No NULL was involved here, so every row resolved to a clean TRUE or FALSE.";
+    }
+    render();
+  };
+
+  /* Join visualiser */
+  WIDGETS["joins"] = function (host) {
+    var cust = [[1,"Ada"],[2,"Blake"],[3,"Chen"],[4,"Diego"]];
+    var ords = [[101,1,240],[102,1,90],[103,2,45],[104,3,220],[105,9,60]];
+    var kinds = ["INNER","LEFT","RIGHT","FULL"], cur = 0;
+    var notes = {
+      INNER: "Only rows that match on <b>both</b> sides. Diego (no orders) disappears, and order 105 (no such customer) disappears too.",
+      LEFT:  "Every <b>customer</b> is kept. Diego survives with NULL order columns — this is how you find customers who never ordered.",
+      RIGHT: "Every <b>order</b> is kept. The orphan order 105 survives with a NULL customer — how you find records pointing at something missing.",
+      FULL:  "Everything from <b>both</b> sides. Diego <i>and</i> the orphan order both appear, each padded with NULLs."
+    };
+    host.innerHTML =
+      '<div class="w-row"><span class="w-lab">JOIN TYPE</span><span class="w-seg"></span></div>' +
+      '<table class="w-tbl"><thead><tr><th>customer</th><th>order id</th><th>amount</th></tr></thead><tbody></tbody></table>' +
+      '<div class="w-out"></div>';
+    var seg = qs(".w-seg", host), tb = qs("tbody", host), out = qs(".w-out", host);
+    kinds.forEach(function (k, i) {
+      var b = document.createElement("button");
+      b.textContent = k;
+      b.addEventListener("click", function () { cur = i; render(); });
+      seg.appendChild(b);
+    });
+    function render() {
+      qsa("button", seg).forEach(function (b, i) { b.className = i === cur ? "on" : ""; });
+      var k = kinds[cur], res = [];
+      cust.forEach(function (c) {
+        var m = ords.filter(function (o) { return o[1] === c[0]; });
+        if (m.length) m.forEach(function (o) { res.push([c[1], o[0], o[2]]); });
+        else if (k === "LEFT" || k === "FULL") res.push([c[1], null, null]);
+      });
+      if (k === "RIGHT" || k === "FULL") {
+        ords.forEach(function (o) {
+          if (!cust.some(function (c) { return c[0] === o[1]; })) res.push([null, o[0], o[2]]);
+        });
+      }
+      tb.innerHTML = res.map(function (r) {
+        var isNull = r[0] === null || r[1] === null;
+        return '<tr class="' + (isNull ? "nullrow" : "keep") + '">' + r.map(function (v) {
+          return "<td>" + (v === null ? "<b>NULL</b>" : v) + "</td>";
+        }).join("") + "</tr>";
+      }).join("");
+      out.className = "w-out";
+      out.innerHTML = "<b>" + k + " JOIN &rarr; " + res.length + " rows.</b> " + notes[k] +
+        " Notice Ada appears twice in every join — she has two orders, and that row-multiplication is the <b>fan-out</b> that silently double-counts sums.";
+    }
+    render();
+  };
+
+  /* Central Limit Theorem sampler */
+  WIDGETS["clt"] = function (host) {
+    var pops = {
+      uniform: function () { return Math.random(); },
+      skewed:  function () { return Math.min(1, -Math.log(1 - Math.random()) / 4); },
+      bimodal: function () { var g = function (m, s) { var u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random();
+                 return m + s * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+                 return Math.max(0, Math.min(1, Math.random() < 0.5 ? g(0.25, 0.07) : g(0.75, 0.07))); }
+    };
+    var popKey = "skewed", n = 5, means = [], popSample = [];
+    host.innerHTML =
+      '<div class="w-row"><span class="w-lab">POPULATION</span><span class="w-seg"></span></div>' +
+      '<div class="w-row"><span class="w-lab">SAMPLE SIZE n</span>' +
+      '<input class="w-slider" type="range" min="1" max="50" value="5"><span class="w-val">5</span>' +
+      '<button class="w-btn primary w-draw">Draw 500 samples</button>' +
+      '<button class="w-btn w-reset">Reset</button></div>' +
+      '<canvas class="w-canvas"></canvas><div class="w-out"></div>';
+    var seg = qs(".w-seg", host), cv = qs("canvas", host), out = qs(".w-out", host);
+    var slider = qs(".w-slider", host), val = qs(".w-val", host);
+    Object.keys(pops).forEach(function (k) {
+      var b = document.createElement("button");
+      b.textContent = k;
+      b.addEventListener("click", function () { popKey = k; means = []; makePop(); render(); });
+      seg.appendChild(b);
+    });
+    slider.addEventListener("input", function () { n = +slider.value; val.textContent = n; means = []; render(); });
+    qs(".w-draw", host).addEventListener("click", function () {
+      for (var i = 0; i < 500; i++) {
+        var s = 0; for (var j = 0; j < n; j++) s += pops[popKey]();
+        means.push(s / n);
+      }
+      render();
+    });
+    qs(".w-reset", host).addEventListener("click", function () { means = []; render(); });
+    function makePop() { popSample = []; for (var i = 0; i < 8000; i++) popSample.push(pops[popKey]()); }
+    function hist(arr, bins, lo, hi) {
+      var h = new Array(bins).fill(0);
+      arr.forEach(function (v) { var b = Math.floor((v - lo) / (hi - lo) * bins); if (b >= 0 && b < bins) h[b]++; });
+      return h;
+    }
+    function render() {
+      qsa("button", seg).forEach(function (b) { b.className = b.textContent === popKey ? "on" : ""; });
+      var r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var W = r.width, H = r.height;
+      cv.width = W * dpr; cv.height = H * dpr;
+      var x = cv.getContext("2d"); x.setTransform(dpr, 0, 0, dpr, 0, 0);
+      x.clearRect(0, 0, W, H);
+      var padL = 14, padR = 14, midY = H * 0.44, gap = 30;
+      function panel(arr, top, bot, color, label, bins) {
+        var h = hist(arr, bins, 0, 1), mx = Math.max.apply(null, h) || 1;
+        var w = (W - padL - padR) / bins;
+        for (var i = 0; i < bins; i++) {
+          var bh = (h[i] / mx) * (bot - top);
+          x.fillStyle = color;
+          x.fillRect(padL + i * w, bot - bh, Math.max(1, w - 1), bh);
+        }
+        x.fillStyle = "#9AA6C0"; x.font = "600 11px Inter, sans-serif";
+        x.fillText(label, padL, top - 6);
+        x.strokeStyle = "rgba(154,166,192,.25)"; x.beginPath();
+        x.moveTo(padL, bot + .5); x.lineTo(W - padR, bot + .5); x.stroke();
+      }
+      panel(popSample, 18, midY, "rgba(234,154,11,.75)", "The population (one draw = one value)", 60);
+      if (means.length) {
+        panel(means, midY + gap, H - 16, "rgba(110,103,255,.85)",
+              "Distribution of the SAMPLE MEAN  (n = " + n + ", " + means.length + " samples)", 60);
+      } else {
+        x.fillStyle = "#6B7793"; x.font = "600 12px Inter, sans-serif";
+        x.fillText("Press “Draw 500 samples” to build the sampling distribution ↓", padL, midY + gap + 22);
+      }
+      if (means.length > 30) {
+        var m = means.reduce(function (a, b) { return a + b; }, 0) / means.length;
+        var sd = Math.sqrt(means.reduce(function (a, b) { return a + (b - m) * (b - m); }, 0) / means.length);
+        out.className = "w-out";
+        out.innerHTML = "Mean of the sample means: <b>" + m.toFixed(3) + "</b> &middot; spread (SE): <b>" +
+          sd.toFixed(3) + "</b>. " + (n === 1
+            ? "At <b>n = 1</b> you are just redrawing the population — same shape, skew and all."
+            : "Even though the population is <b>" + popKey + "</b>, the sample mean is piling into a <b>bell</b> — and it gets <b>narrower</b> as n grows. That is the Central Limit Theorem doing its work.");
+      } else {
+        out.className = "w-out";
+        out.innerHTML = "Pick a population shape, set <b>n</b>, then draw samples. Watch what happens to the <b>bottom</b> histogram as you raise n — that is the whole idea behind confidence intervals and A/B tests.";
+      }
+    }
+    makePop(); render();
+    window.addEventListener("resize", function () { render(); });
+  };
+
+  function setupWidgets() {
+    qsa(".widget").forEach(function (w) {
+      var kind = w.getAttribute("data-widget"), body = qs(".w-body", w), fn = WIDGETS[kind];
+      if (!fn) return;
+      body.innerHTML = "";
+      try { fn(body); } catch (e) { body.textContent = "(this explorer could not load)"; }
     });
   }
 

@@ -94,6 +94,11 @@ p.append(B.note(
  "`RIGHT`/`FULL`, so the runnable code above uses `LEFT` &mdash; but the picture and the idea are "
  "universal, and most databases support all four directly.)", "&#8250;"))
 
+p.append(B.widget("joins", "Switch the join type and watch the rows change",
+ "Same two tables every time &mdash; only the join keyword changes. Watch Diego (a customer with no "
+ "orders) and order 105 (an order with no customer) appear and disappear, and notice Ada always "
+ "appearing twice: that is fan-out."))
+
 p.append(B.h2("Answering the real question — join, then group", kicker="Worked example"))
 p.append(B.concept(
  "\"How much has each customer spent, and who has never ordered?\" is a `LEFT JOIN` (keep everyone) "

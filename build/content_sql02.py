@@ -110,6 +110,11 @@ p.append(B.warn(
  "Forgetting this quietly biases counts and averages &mdash; and it is one of the most common SQL "
  "interview questions.", "&#9650;"))
 
+p.append(B.widget("null-logic", "See the NULL trap happen, row by row",
+ "Switch the `WHERE` condition and watch which rows survive. The two customers with a **NULL** "
+ "plan are dropped by *both* `= 'pro'` **and** `!= 'pro'` &mdash; because a comparison against "
+ "NULL is neither true nor false. Only `IS NULL` can catch them."))
+
 p.append(B.h2("Sorting and de-duplicating: ORDER BY & DISTINCT", kicker="Concept"))
 p.append(B.concept(
  "~ORDER BY~ sorts the result. You can sort by several keys and pick a direction for each: `ORDER "

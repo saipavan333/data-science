@@ -45,6 +45,12 @@ p.append(B.tip(
  "heavy-tailed one (rare giant values) may need hundreds. When in doubt, simulate &mdash; exactly "
  "as the charts above do."))
 
+p.append(B.widget("clt", "Watch the Central Limit Theorem happen",
+ "Pick a population &mdash; even a badly **skewed** or **bimodal** one &mdash; then raise **n** and "
+ "draw samples. The top histogram is the population; the bottom one is the distribution of the "
+ "**sample mean**. However ugly the population, the bottom turns into a bell, and narrows as n "
+ "grows. That single fact is what makes confidence intervals and A/B tests possible.", height=420))
+
 p.append(B.h2("See it converge in code", kicker="Worked example"))
 p.append(B.concept(
  "A single die roll is uniform &mdash; every face equally likely, about as un-bell-shaped as it "

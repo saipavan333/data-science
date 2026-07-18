@@ -347,3 +347,19 @@ def lab(task, setup, solution, starter="", hint="", title="Your turn", explain="
       % (attresc(setup), attresc(expected), esc(title), fmt(task), esc(starter),
          inline(hint or "Re-read the task and check which clause each requirement belongs in."),
          sol_block))
+
+
+# ---------------------------------------------------------------------------
+# INTERACTIVE WIDGET ENGINE
+# Emits a mount point; app.js looks up `kind` in its widget registry and builds
+# the interactive UI inside it. Keeps content modules free of raw JavaScript.
+# ---------------------------------------------------------------------------
+
+def widget(kind, title, caption="", height=360):
+    return ('<figure class="widget" data-widget="%s" style="--wh:%dpx">'
+            '<div class="w-head"><span class="w-badge">&#9673; INTERACTIVE</span>'
+            '<span class="w-title">%s</span></div>'
+            '<div class="w-body"><noscript>This explorer needs JavaScript enabled.</noscript></div>'
+            '%s</figure>'
+            % (attresc(kind), height, esc(title),
+               ('<figcaption>%s</figcaption>' % inline(caption)) if caption else ''))
