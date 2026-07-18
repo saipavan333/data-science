@@ -160,11 +160,15 @@ def interview_check(items, title="Interview check"):
             '<ul>%s</ul></div>' % (esc(title), lis))
 
 def render_sidebar(tracks, active_id, link_base, index_href):
+    total = sum(len(t["lessons"]) for t in tracks)
     parts = ['<a class="brand" href="%s"><span class="mark">DS</span>'
-             '<span class="name">Data Science Mentor<small>zero &#8594; job-ready</small>'
+             '<span class="name">Data Science Masterclass<small>zero &#8594; job-ready</small>'
              '</span></a>' % index_href]
-    parts.append('<div class="side-meta">A guided, gold-standard path &mdash; built by your '
-                 'mentor.</div>')
+    parts.append('<button class="side-search" id="side-search">%s<span>Search lessons</span>'
+                 '<span class="kbd">Ctrl K</span></button>' % _SEARCH_SVG)
+    parts.append('<div class="side-prog"><div class="prow"><span class="plabel">Your progress</span>'
+                 '<span class="pcount" id="side-pcount">0 / %d</span></div>'
+                 '<div class="pbar"><div class="pfill" id="side-pfill"></div></div></div>' % total)
     for t in tracks:
         st = t.get("status", "soon")
         open_attr = ""
@@ -172,31 +176,67 @@ def render_sidebar(tracks, active_id, link_base, index_href):
         for ls in t["lessons"]:
             cls = "active" if ls["id"] == active_id else ""
             pill = "" if ls.get("ready") else '<span class="pill">soon</span>'
-            lessons_html += '<li><a class="%s" href="%s%s.html">%s%s</a></li>' % (
-                cls, link_base, ls["id"], esc(ls["title"]), pill)
+            lessons_html += '<li><a class="%s" data-lid="%s" href="%s%s.html">%s%s</a></li>' % (
+                cls, ls["id"], link_base, ls["id"], esc(ls["title"]), pill)
             if ls["id"] == active_id:
                 open_attr = " open"
         parts.append(
-            '<details class="nav-track" data-status="%s"%s>'
+            '<details class="nav-track" data-status="%s" data-track="%s"%s>'
             '<summary><span class="tnum">%s</span><span>%s</span>'
             '<span class="chev">&#9656;</span></summary>'
             '<ul class="nav-lessons">%s</ul></details>'
-            % (st, open_attr, t["num"], esc(t["title"]), lessons_html))
+            % (st, t["num"], open_attr, t["num"], esc(t["title"]), lessons_html))
+    parts.append('<div class="side-foot">Built as a masterclass &mdash; learn, practice, '
+                 'quiz, and revise. Your progress saves on this device.</div>')
     return '<aside class="sidebar">%s</aside>' % "".join(parts)
 
-def page(title, inner, sidebar, assets_prefix, desc=""):
+FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com">'
+         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
+         '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700'
+         '&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600'
+         '&display=swap" rel="stylesheet">')
+
+_SEARCH_SVG = ('<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+               'stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle>'
+               '<path d="m21 21-4.3-4.3"></path></svg>')
+
+CMDK = ('<div class="cmdk" id="cmdk"><div class="cmdk-box">'
+        '<div class="cmdk-in">%s<input id="cmdk-input" autocomplete="off" spellcheck="false" '
+        'placeholder="Search every lesson &mdash; type a topic like &lsquo;p-value&rsquo; or &lsquo;join&rsquo;"><span class="esc">ESC</span></div>'
+        '<div class="cmdk-list" id="cmdk-list"></div></div></div>' % _SEARCH_SVG)
+
+TOAST = '<div class="toast" id="toast"></div>'
+
+DECK = ('<div class="deck" id="deck"><div class="card"><button class="dk-close" id="dk-close" '
+        'aria-label="Close">&times;</button><div class="dk-count" id="dk-count"></div>'
+        '<div class="dk-q" id="dk-q"></div><div class="dk-actions">'
+        '<button class="dk-btn" id="dk-again">Still fuzzy</button>'
+        '<button class="dk-btn primary" id="dk-got">Got it &#8594;</button></div></div></div>')
+
+def topbar(crumbs_html, lesson_id="", mark=True):
+    mc = ('<button class="tb-btn" id="mark-btn" data-lesson="%s">'
+          '<span class="mc-ico">&#9711;</span><span class="mc-txt">Mark complete</span></button>'
+          % attresc(lesson_id)) if mark and lesson_id else ""
+    return ('<div class="topbar"><button class="menu-btn" aria-label="Open lessons">&#9776;</button>'
+            '<div class="crumbs">%s</div><div class="tb-spacer"></div>%s'
+            '<button class="tb-btn" id="cmdk-btn">%s Search <span class="kbd">Ctrl K</span></button>'
+            '</div>' % (crumbs_html, mc, _SEARCH_SVG))
+
+def page(title, inner, sidebar, assets_prefix, desc="", body_class="", top="", lesson_id=""):
     return (
 '<!DOCTYPE html>\n<html lang="en">\n<head>\n'
 '<meta charset="utf-8">\n'
 '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
 '<title>%s</title>\n'
 '<meta name="description" content="%s">\n'
+'%s\n'
 '<link rel="stylesheet" href="%sassets/css/styles.css">\n'
-'</head>\n<body>\n<div class="scrim"></div>\n<div class="app">\n%s\n'
-'<div class="main">\n<button class="menu-btn" aria-label="Open lesson menu">'
-'&#9776; Lessons</button>\n<main class="content">\n%s\n</main>\n</div>\n</div>\n'
-'<script src="%sassets/js/app.js"></script>\n</body>\n</html>\n'
-        % (esc(title), attresc(desc), assets_prefix, sidebar, inner, assets_prefix))
+'</head>\n<body class="%s" data-lesson="%s">\n'
+'<div class="readbar" id="readbar"></div>\n<div class="scrim"></div>\n<div class="app">\n%s\n'
+'<div class="main">\n%s\n<main class="content">\n%s\n</main>\n</div>\n</div>\n'
+'%s%s%s\n<script src="%sassets/js/app.js"></script>\n</body>\n</html>\n'
+        % (esc(title), attresc(desc), FONTS, assets_prefix, attresc(body_class),
+           attresc(lesson_id), sidebar, top, inner, CMDK, TOAST, DECK, assets_prefix))
 
 def lesson_nav(prev, nxt):
     if prev:
@@ -233,13 +273,19 @@ def lesson_header(meta, track_title):
         bits.append('<span>Lesson %s of %s in track <span class="dotline">%s</span></span>'
                     % (on, tot, dots))
     meta_row = '<div class="meta-row">%s</div>' % "".join(bits)
-    return crumbs + tag + title + lede + meta_row + '<hr class="rule">'
+    return tag + title + lede + meta_row + '<hr class="rule">'
 
 def build_lesson_page(tracks, meta, body_html, prev, nxt, track_title):
     sidebar = render_sidebar(tracks, meta["id"], "", "../index.html")
-    inner = lesson_header(meta, track_title) + body_html + lesson_nav(prev, nxt)
-    return page(meta["title"] + " · Data Science Mentor", inner, sidebar, "../",
-                desc=meta.get("lede", ""))
+    crumbs = ('<a href="../index.html">Home</a> &rsaquo; <span>%s</span> &rsaquo; '
+              '<span class="cur">Lesson %s</span>'
+              % (esc(track_title), esc(str(meta.get("num", "")))))
+    top = topbar(crumbs, lesson_id=meta["id"], mark=True)
+    revise = ('<button class="revise-cta" id="revise-btn">&#9788; Revise this lesson '
+              '&mdash; flashcards</button>')
+    inner = lesson_header(meta, track_title) + body_html + revise + lesson_nav(prev, nxt)
+    return page(meta["title"] + " · Data Science Masterclass", inner, sidebar, "../",
+                desc=meta.get("lede", ""), body_class="lesson", top=top, lesson_id=meta["id"])
 
 def placeholder_body(meta, track_title, outline):
     items = "".join("<li>%s</li>" % inline(x) for x in outline) if outline else ""

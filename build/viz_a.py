@@ -64,7 +64,8 @@ axes[0,0].set_ylabel("the population", fontsize=12, color=INK_SOFT)
 axes[1,0].set_ylabel("mean of n=30\n(3000 samples)", fontsize=12, color=INK_SOFT)
 fig.suptitle("The Central Limit Theorem: whatever the population shape, the sample mean becomes normal",
     fontsize=14, fontweight="bold", y=0.99, color=INK)
-fig.text(0.5, 0.5, "↓ take many samples of 30, average each ↓", ha="center", fontsize=11,
+fig.subplots_adjust(top=0.90, bottom=0.10, hspace=0.55)
+fig.text(0.5, 0.475, "↓ take many samples of 30, average each ↓", ha="center", fontsize=11,
     color=INK_FAINT, style="italic")
 save(fig, "s7_clt.png")
 
@@ -78,7 +79,7 @@ for ax,nn in zip(axes, [1, 5, 30]):
     ax.set_xlabel("sample mean")
 axes[0].text(.5,.9,"still skewed\n(n=1 is just the population)",transform=axes[0].transAxes,
     fontsize=9.5,color=INK_SOFT,ha="center",va="top")
-axes[2].text(.5,.9,"now bell-shaped",transform=axes[2].transAxes,fontsize=9.5,color=GREEN,ha="center",va="top")
+axes[2].text(.97,.9,"now bell-shaped",transform=axes[2].transAxes,fontsize=9.5,color=GREEN,ha="right",va="top")
 fig.suptitle("Larger samples → the sampling distribution gets more normal and narrower",
     fontsize=13.5, fontweight="bold", y=1.04, color=INK)
 save(fig, "s7_clt_n.png")

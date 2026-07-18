@@ -35,7 +35,7 @@ ax.annotate("", xy=(50,1.06), xytext=(56,1.06), arrowprops=dict(arrowstyle="<->"
 ax.text(53,1.12,"difference in means", ha="center", color=INK, fontsize=10.5)
 ax.set_ylim(0,1.25); ax.set_yticks([]); despine(ax,left=False)
 ax.legend(frameon=False, loc="upper left"); ax.set_xlabel("outcome value")
-ax.set_title("A t-test asks: is the gap between means big *relative to the spread*?", loc="left")
+ax.set_title("A t-test asks: is the gap between means big relative to the spread?", loc="left")
 ax.text(65,0.5,"t = difference in means\n———————————\nstandard error", fontsize=10.5, color=INK_SOFT, ha="center")
 save(fig,"s10_ttest.png")
 
