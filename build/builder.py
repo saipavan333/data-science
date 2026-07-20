@@ -382,3 +382,70 @@ def cheatsheet(title, intro, groups):
     return ('<div class="cheatsheet"><div class="cs-head"><span class="cs-badge">&#9636; CHEATSHEET</span>'
             '<h2>%s</h2><button class="cs-print" onclick="window.print()">Print</button></div>'
             '%s<div class="cs-grid">%s</div></div>' % (esc(title), intro_html, cards))
+
+
+# ---------------------------------------------------------------------------
+# PYTHON LAB — learner writes Python, runs it in-browser, and is checked
+# against the value the reference solution assigns to `answer` (computed here).
+# ---------------------------------------------------------------------------
+
+def _py_canon_value(a):
+    if isinstance(a, bool):
+        return str(a)
+    if isinstance(a, float):
+        return format(round(a, 4), "g")
+    if isinstance(a, int):
+        return str(a)
+    if isinstance(a, (list, tuple)):
+        return ",".join(_py_canon_value(x) for x in a)
+    try:
+        import numpy as _np
+        if isinstance(a, _np.floating):
+            return format(round(float(a), 4), "g")
+        if isinstance(a, _np.integer):
+            return str(int(a))
+        if isinstance(a, _np.ndarray):
+            return _py_canon_value(a.tolist())
+    except Exception:
+        pass
+    try:
+        import pandas as _pd
+        if isinstance(a, (_pd.Series, _pd.DataFrame)):
+            return a.to_string()
+    except Exception:
+        pass
+    return str(a)
+
+def _py_canon(setup, solution):
+    g = {}
+    exec(compile(setup + "\n" + solution + "\n", "<sol>", "exec"), g)
+    if "answer" not in g:
+        raise ValueError("reference solution did not set `answer`")
+    return _py_canon_value(g["answer"])
+
+def pylab(task, setup, solution, starter="", hint="", title="Your turn", explain="",
+          preview=""):
+    expected = _py_canon(setup, solution)          # executed at build time
+    starter = starter or "# assign your result to a variable called `answer`\nanswer = "
+    sol_block = ('<div class="lab-solcode"><pre><code>%s</code></pre></div>%s'
+                 % (esc(solution.strip()), ("<p>%s</p>" % inline(explain)) if explain else ""))
+    prev = ('<div class="lab-preview">%s</div>' % inline(preview)) if preview else ""
+    return (
+      '<div class="lab" data-lang="py" data-setup="%s" data-expected="%s">'
+      '<div class="lab-head"><span class="lab-badge">&#9670; LAB</span>'
+      '<span class="lab-title">%s</span><span class="lab-state" aria-live="polite"></span></div>'
+      '<div class="lab-task">%s</div>%s'
+      '<div class="lab-editor"><textarea class="lab-code" spellcheck="false" rows="7">%s</textarea></div>'
+      '<div class="lab-actions">'
+      '<button class="lab-btn lab-run">&#9654; Run</button>'
+      '<button class="lab-btn primary lab-check">Check my answer</button>'
+      '<button class="lab-btn ghost lab-hint-btn">Hint</button>'
+      '<button class="lab-btn ghost lab-sol-btn">Solution</button>'
+      '<button class="lab-btn ghost lab-reset">Reset</button></div>'
+      '<div class="lab-msg"></div>'
+      '<div class="lab-out"><div class="cc-out-label">Your result</div><pre></pre></div>'
+      '<div class="lab-reveal lab-hint" hidden><b>Hint.</b> %s</div>'
+      '<div class="lab-reveal lab-sol" hidden><b>Reference solution.</b>%s</div>'
+      '</div>'
+      % (attresc(setup), attresc(expected), esc(title), fmt(task), prev, esc(starter),
+         inline(hint or "Assign your result to a variable named `answer`."), sol_block))

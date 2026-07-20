@@ -49,6 +49,11 @@ p.append(B.callout("pitfall","Three things a p-value is NOT",
  "difference can have a tiny p-value with enough data. (3) A large p-value does **not** prove "
  "H&#8320;; 'we couldn't find an effect' is not 'there is no effect.'", "&#10007;"))
 
+p.append(B.widget("pvalue", "Slide the result, watch the p-value",
+ "Drag the observed result away from the centre. The shaded tails are the ~p-value~ &mdash; the "
+ "chance of a result this extreme *if H0 were true*. Watch it cross &alpha; = 0.05 and flip the "
+ "decision from \"fail to reject\" to \"reject\".", height=340))
+
 p.append(B.h2("Significance and the two ways to be wrong", kicker="Concept · decisions and errors"))
 p.append(B.concept(
  "To decide, we set a threshold *before* looking: the ~significance level~ &alpha; (alpha), "
@@ -105,6 +110,24 @@ p.append(B.concept(
  "we did *not* claim &mdash; that B is *hugely* better, or that we're 98.8% sure it's better. We "
  "claimed exactly one thing: chance alone is an unlikely explanation. (Whether a ~0.9-point lift "
  "is worth shipping is a business question &mdash; that's Track 6.)"))
+
+PLAB_SETUP = (
+ "from scipy import stats\n"
+ "group_a = [52,48,55,49,51,53,47,50,54,52]\n"
+ "group_b = [53,56,52,57,54,51,55,53,58,52]\n")
+p.append(B.h2("Your turn — run a real test", kicker="Interactive lab"))
+p.append(B.pylab(
+ "Two groups' measurements are in the lists `group_a` and `group_b`. Run a two-sample t-test with "
+ "`scipy.stats.ttest_ind` and assign to **`answer`** the **p-value, rounded to 4 decimals**. Then "
+ "decide for yourself: at &alpha; = 0.05, is the difference significant?",
+ PLAB_SETUP,
+ "answer = round(float(stats.ttest_ind(group_a, group_b).pvalue), 4)",
+ starter="# from scipy import stats  (already imported)\n# group_a, group_b are Python lists\nanswer = ",
+ hint="`stats.ttest_ind(group_a, group_b)` returns an object; take `.pvalue`, wrap in `round(float(...), 4)`.",
+ title="Lab — a two-sample t-test",
+ preview="`group_a`, `group_b` &rarr; two lists of measurements; `scipy.stats` is imported.",
+ explain="`ttest_ind` compares two independent means; the tiny p-value here says the gap is very "
+         "unlikely under the null, so you would reject it at 0.05."))
 
 p.append(B.keypoints([
  "Hypothesis testing assumes the ~null~ (H&#8320;: no effect) and asks whether the data is "

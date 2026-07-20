@@ -491,30 +491,62 @@
     "print('__CANON__' + ';'.join('|'.join(_c(v) for v in r) for r in rows))"
   ].join("\n");
 
+  var PY_LAB_HARNESS = [
+    "_g = {}",
+    "exec(SETUP, _g)",
+    "exec(USER_CODE, _g)",
+    "def __cv(a):",
+    "    if isinstance(a, bool): return str(a)",
+    "    if isinstance(a, float): return format(round(a,4),'g')",
+    "    if isinstance(a, int): return str(a)",
+    "    if isinstance(a, (list, tuple)): return ','.join(__cv(x) for x in a)",
+    "    try:",
+    "        import numpy as _np",
+    "        if isinstance(a, _np.floating): return format(round(float(a),4),'g')",
+    "        if isinstance(a, _np.integer): return str(int(a))",
+    "        if isinstance(a, _np.ndarray): return __cv(a.tolist())",
+    "    except Exception: pass",
+    "    try:",
+    "        import pandas as _pd",
+    "        if isinstance(a, (_pd.Series, _pd.DataFrame)): return a.to_string()",
+    "    except Exception: pass",
+    "    return str(a)",
+    "if 'answer' in _g:",
+    "    print(_g['answer'])",
+    "    print('__CANON__' + __cv(_g['answer']))",
+    "else:",
+    "    print('(no variable named answer was set - assign your result to a variable called answer)')"
+  ].join("\n");
+
   function setupLabs() {
     qsa(".lab").forEach(function (lab) {
       var codeEl = qs(".lab-code", lab), starter = codeEl.value;
       var outBox = qs(".lab-out", lab), outPre = qs(".lab-out pre", lab);
       var msg = qs(".lab-msg", lab), state = qs(".lab-state", lab);
       var setup = lab.getAttribute("data-setup"), expected = lab.getAttribute("data-expected");
+      var lang = lab.getAttribute("data-lang") || "sql";
       function setMsg(kind, html) { msg.className = "lab-msg show " + kind; msg.innerHTML = html; }
 
       function exec(after) {
         var btns = qsa(".lab-btn", lab);
         btns.forEach(function (b) { b.disabled = true; });
-        setMsg("info", "Running your query…");
+        setMsg("info", "Running…");
         outBox.classList.add("show"); outPre.textContent = "";
+        var needPkgs = lang === "py" ? neededPackages(setup + "\n" + codeEl.value) : [];
         loadPyodideOnce(function (t) { outPre.textContent = t; }).then(function (py) {
+          return (needPkgs.length ? py.loadPackage(needPkgs).catch(function () { return null; }) : Promise.resolve()).then(function () { return py; });
+        }).then(function (py) {
           var buf = "";
           py.setStdout({ batched: function (s) { buf += s + "\n"; } });
           py.setStderr({ batched: function (s) { buf += s + "\n"; } });
           py.globals.set("SETUP", setup);
-          py.globals.set("USER_SQL", codeEl.value);
+          if (lang === "py") { py.globals.set("USER_CODE", codeEl.value); }
+          else { py.globals.set("USER_SQL", codeEl.value); }
           try {
-            py.runPython(LAB_HARNESS);
+            py.runPython(lang === "py" ? PY_LAB_HARNESS : LAB_HARNESS);
           } catch (e) {
             outPre.textContent = String((e && e.message) || e);
-            setMsg("no", "<b>That query didn't run.</b> Read the error above — it usually names the exact word SQL tripped on.");
+            setMsg("no", "<b>That didn't run.</b> Read the error above — it names the line and the problem.");
             state.textContent = ""; state.className = "lab-state";
             return null;
           }
@@ -739,6 +771,53 @@
     }
     makePop(); render();
     window.addEventListener("resize", function () { render(); });
+  };
+
+
+  /* p-value simulator */
+  WIDGETS["pvalue"] = function (host) {
+    var z = 2.1, alpha = 0.05;
+    host.innerHTML =
+      '<div class="w-row"><span class="w-lab">OBSERVED RESULT (standard errors from H0)</span>' +
+      '<input class="w-slider" type="range" min="0" max="4" step="0.05" value="2.1"><span class="w-val">2.10</span></div>' +
+      '<canvas class="w-canvas" style="height:300px"></canvas><div class="w-out"></div>';
+    var cv = qs("canvas", host), out = qs(".w-out", host), slider = qs(".w-slider", host), val = qs(".w-val", host);
+    function erf(x) { var s = x < 0 ? -1 : 1; x = Math.abs(x); var t = 1 / (1 + 0.3275911 * x);
+      var y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x);
+      return s * y; }
+    function phi(x) { return 0.5 * (1 + erf(x / Math.SQRT2)); }
+    slider.addEventListener("input", function () { z = +slider.value; val.textContent = z.toFixed(2); render(); });
+    function render() {
+      var r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2), W = r.width, H = r.height;
+      cv.width = W * dpr; cv.height = H * dpr; var x = cv.getContext("2d"); x.setTransform(dpr, 0, 0, dpr, 0, 0);
+      x.clearRect(0, 0, W, H);
+      var lo = -4, hi = 4, padB = 24, padT = 12;
+      function X(v) { return (v - lo) / (hi - lo) * W; }
+      function Y(d) { return H - padB - d * (H - padB - padT) / 0.4; }
+      function pdf(v) { return Math.exp(-v * v / 2) / Math.sqrt(2 * Math.PI); }
+      x.fillStyle = "rgba(239,62,104,.32)";
+      [[-4, -z], [z, 4]].forEach(function (seg) {
+        if (seg[1] <= seg[0]) return;
+        x.beginPath(); x.moveTo(X(seg[0]), H - padB);
+        for (var v = seg[0]; v <= seg[1]; v += 0.02) x.lineTo(X(v), Y(pdf(v)));
+        x.lineTo(X(seg[1]), H - padB); x.closePath(); x.fill();
+      });
+      x.beginPath();
+      for (var v = lo; v <= hi; v += 0.02) { var px = X(v), py = Y(pdf(v)); v === lo ? x.moveTo(px, py) : x.lineTo(px, py); }
+      x.strokeStyle = "#6E67FF"; x.lineWidth = 2; x.stroke();
+      x.strokeStyle = "rgba(154,166,192,.4)"; x.beginPath(); x.moveTo(0, H - padB); x.lineTo(W, H - padB); x.stroke();
+      x.strokeStyle = "#EF3E68"; x.lineWidth = 1.5;
+      [z, -z].forEach(function (v) { x.beginPath(); x.moveTo(X(v), padT); x.lineTo(X(v), H - padB); x.stroke(); });
+      x.fillStyle = "#9AA6C0"; x.font = "600 11px Inter, sans-serif";
+      x.fillText("if H0 is true, results cluster here", X(0) - 78, padT + 10);
+      var pv = 2 * (1 - phi(Math.abs(z)));
+      out.className = "w-out " + (pv < alpha ? "true" : "unknown");
+      out.innerHTML = "Two-tailed p-value = <b>" + pv.toFixed(4) + "</b> (the shaded area). " +
+        (pv < alpha
+          ? "Below &alpha; = 0.05 &rarr; <b>reject H0</b>: statistically significant. Pure chance would produce something this extreme only <b>" + (pv * 100).toFixed(2) + "%</b> of the time."
+          : "Above &alpha; = 0.05 &rarr; <b>fail to reject H0</b>: not enough evidence. Chance alone gives a result this extreme <b>" + (pv * 100).toFixed(1) + "%</b> of the time.");
+    }
+    render(); window.addEventListener("resize", render);
   };
 
   function setupWidgets() {

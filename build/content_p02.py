@@ -75,6 +75,21 @@ p.append(B.concept(
  "array-first mindset is exactly what Pandas builds on &mdash; a DataFrame column *is* a NumPy "
  "array with a label, so everything here transfers directly to the next lesson."))
 
+PLAB_SETUP = (
+ "import numpy as np\n"
+ "arr = np.array([12, 45, 7, 88, 33, 61, 5, 99, 21, 74])\n")
+p.append(B.h2("Your turn — think in arrays", kicker="Interactive lab"))
+p.append(B.pylab(
+ "`arr` is a NumPy array of 10 numbers. Using a **boolean mask** (no loop), assign to **`answer`** "
+ "the **average of only the values greater than 50**, rounded to 2 decimals.",
+ PLAB_SETUP,
+ "answer = round(float(arr[arr > 50].mean()), 2)",
+ starter="# arr = np.array([12, 45, 7, 88, 33, 61, 5, 99, 21, 74])\nanswer = ",
+ hint="`arr[arr > 50]` keeps the big values; take `.mean()`, wrap in `round(float(...), 2)`.",
+ title="Lab — boolean mask + aggregate",
+ preview="`arr` &rarr; a 10-element NumPy array, already loaded.",
+ explain="The mask `arr > 50` selects the qualifying elements; `.mean()` averages just those."))
+
 p.append(B.keypoints([
  "A NumPy ~array~ holds same-type numbers compactly; ~vectorization~ applies one operation to "
  "every element in fast compiled code.",

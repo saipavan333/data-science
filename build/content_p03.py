@@ -86,6 +86,25 @@ p.append(B.concept(
  "if returned else the amount*. That readability, on top of NumPy speed, is why Pandas is the "
  "workhorse &mdash; and why the cleaning and reshaping in the next lessons feel natural."))
 
+PLAB_SETUP = (
+ "import pandas as pd\n"
+ "df = pd.DataFrame({\n"
+ "    'customer':['Ada','Blake','Chen','Diego','Ada','Priya','Blake','Chen'],\n"
+ "    'category':['Electronics','Apparel','Electronics','Home','Apparel','Electronics','Home','Electronics'],\n"
+ "    'amount':  [240,45,220,130,190,510,160,300],\n"
+ "})\n")
+p.append(B.h2("Your turn — work a real DataFrame", kicker="Interactive lab"))
+p.append(B.pylab(
+ "The DataFrame `df` has columns `customer`, `category`, `amount`. Assign to **`answer`** the "
+ "**category with the highest total revenue** (a string).",
+ PLAB_SETUP,
+ "answer = df.groupby('category')['amount'].sum().idxmax()",
+ starter="# df has columns: customer, category, amount\nanswer = ",
+ hint="Group by category, sum the amount, then take the label of the biggest group with `.idxmax()`.",
+ title="Lab — split-apply-combine",
+ preview="`df` &rarr; 8 rows of customer / category / amount, already loaded.",
+ explain="`groupby(...).sum()` gives revenue per category; `.idxmax()` returns the winning label."))
+
 p.append(B.keypoints([
  "A ~Series~ is one labeled column; a ~DataFrame~ is a table of Series sharing an ~index~.",
  "Load with `pd.read_csv(...)`, then **inspect**: `.head()`, `.shape`, `.dtypes`/`.info()`, "
