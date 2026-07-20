@@ -490,6 +490,14 @@ TRACKS = [
                  "'The test is flat — what now?'",
              ]
             },
+            {"id": "ab-07-cheat", "num": "6.7",
+             "title": "A/B Testing Cheatsheet",
+             "lede": "The whole experimentation track on one printable page.",
+             "minutes": 6, "ready": False,
+             "outline": [
+                 "Design checklist", "Power & analysis", "The pitfalls",
+             ]
+            },
         ],
     },
     # ===================================================================== #
