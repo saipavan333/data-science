@@ -226,7 +226,7 @@ p.append(B.deepdive(
   "define in `SELECT` isn't usable in `WHERE` or `GROUP BY` (they ran earlier) but usually *is* "
   "usable in `ORDER BY` (which runs last).") +
  B.concept(
-  "**COUNT(*) vs COUNT(col) vs COUNT(DISTINCT col).** `COUNT(*)` counts rows. `COUNT(col)` counts "
+  "**The three COUNTs.** `COUNT(*)` counts rows. `COUNT(col)` counts "
   "rows where `col` is non-NULL — handy for \"how many orders actually have a recorded amount?\" "
   "`COUNT(DISTINCT col)` counts *distinct* non-NULL values — \"how many different categories "
   "does this customer buy?\" Choosing the wrong one silently changes the number, so name to yourself "

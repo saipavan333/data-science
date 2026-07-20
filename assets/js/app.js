@@ -1025,6 +1025,73 @@
     window.addEventListener("resize", render);
   };
 
+
+  /* A/B test simulator */
+  WIDGETS["abtest"] = function (host) {
+    var trueA = 0.10, effect = 0.02, N = 2000, scenario = 1;
+    host.innerHTML =
+      '<div class="w-row"><span class="w-lab">REALITY</span><span class="w-seg">' +
+      '<button data-s="1">B is really 2pp better</button><button data-s="0">no real difference</button></span></div>' +
+      '<div class="w-row"><span class="w-lab">USERS PER VARIANT</span>' +
+      '<input class="w-slider" type="range" min="100" max="20000" step="100" value="2000"><span class="w-val">2000</span>' +
+      '<button class="w-btn primary w-run">&#9654; Run experiment</button></div>' +
+      '<canvas class="w-canvas" style="height:210px"></canvas><div class="w-out"></div>';
+    var seg = qs(".w-seg", host), cv = qs("canvas", host), out = qs(".w-out", host);
+    var slider = qs(".w-slider", host), val = qs(".w-val", host);
+    function erf(x){var sgn=x<0?-1:1;x=Math.abs(x);var t=1/(1+0.3275911*x);
+      var y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return sgn*y;}
+    function phi(x){return 0.5*(1+erf(x/Math.SQRT2));}
+    var last = null;
+    qsa("button[data-s]", seg).forEach(function (b) { b.addEventListener("click", function () { scenario = +b.dataset.s; mark(); run(); }); });
+    slider.addEventListener("input", function () { N = +slider.value; val.textContent = N; });
+    qs(".w-run", host).addEventListener("click", run);
+    function mark(){ qsa("button[data-s]", seg).forEach(function(b){ b.className = (+b.dataset.s===scenario)?"on":""; }); }
+    function draws(n, p){ var x=0; for (var i=0;i<n;i++) if (Math.random()<p) x++; return x; }
+    function run() {
+      var pB = trueA + (scenario ? effect : 0);
+      var xA = draws(N, trueA), xB = draws(N, pB);
+      var rA = xA/N, rB = xB/N;
+      var pooled = (xA+xB)/(2*N), se = Math.sqrt(pooled*(1-pooled)*(2/N));
+      var z = se>0 ? (rB-rA)/se : 0, pval = 2*(1-phi(Math.abs(z)));
+      var seA=Math.sqrt(rA*(1-rA)/N), seB=Math.sqrt(rB*(1-rB)/N);
+      last = {rA:rA, rB:rB, ciA:1.96*seA, ciB:1.96*seB, lift:rB-rA, pval:pval};
+      draw(); report();
+    }
+    function draw() {
+      var r=cv.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2),W=r.width,H=r.height;
+      if(W<2)return; cv.width=W*dpr;cv.height=H*dpr;var x=cv.getContext("2d");x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,W,H);
+      if(!last)return;
+      var padB=26,padT=16,maxR=Math.max(last.rA+last.ciA,last.rB+last.ciB,0.16)*1.1;
+      function Y(v){return H-padB-v/maxR*(H-padB-padT);}
+      var bars=[["A (control)",last.rA,last.ciA,"#8791A5"],["B (variant)",last.rB,last.ciB,"#5B54F0"]];
+      var bw=(W-80)/2;
+      bars.forEach(function(b,i){
+        var bx=50+i*(bw+20)+8;
+        x.fillStyle=b[3]; x.globalAlpha=0.9; x.fillRect(bx,Y(b[1]),bw-40,H-padB-Y(b[1])); x.globalAlpha=1;
+        // CI whisker
+        x.strokeStyle="#161C29";x.lineWidth=1.6;var cx=bx+(bw-40)/2;
+        x.beginPath();x.moveTo(cx,Y(b[1]+b[2]));x.lineTo(cx,Y(b[1]-b[2]));
+        x.moveTo(cx-6,Y(b[1]+b[2]));x.lineTo(cx+6,Y(b[1]+b[2]));
+        x.moveTo(cx-6,Y(b[1]-b[2]));x.lineTo(cx+6,Y(b[1]-b[2]));x.stroke();
+        x.fillStyle="#EAEEF7";x.font="600 12px Inter, sans-serif";x.textAlign="center";
+        x.fillText((b[1]*100).toFixed(1)+"%",cx,Y(b[1])-10);
+        x.fillStyle="#9AA6C0";x.font="600 11px Inter, sans-serif";x.fillText(b[0],cx,H-9);
+      });
+      x.textAlign="left";
+    }
+    function report() {
+      var L=last, sig=L.pval<0.05;
+      out.className="w-out "+(sig?"true":"unknown");
+      out.innerHTML="Observed: A = <b>"+(L.rA*100).toFixed(1)+"%</b>, B = <b>"+(L.rB*100).toFixed(1)+
+        "%</b> (lift "+(L.lift>=0?"+":"")+(L.lift*100).toFixed(1)+"pp) &middot; p-value <b>"+L.pval.toFixed(3)+"</b>. "+
+        (sig ? "<b>Significant</b> (p &lt; 0.05): you'd call B the winner. "
+             : "<b>Not significant</b>: the confidence intervals overlap, so you can't rule out chance. ")+
+        (scenario ? (sig?"Here B really is better &mdash; a true positive.":"But B really is 2pp better! With this few users you lacked the <b>power</b> to detect it &mdash; slide users up and re-run.")
+                  : (sig?"But there's really <b>no</b> difference &mdash; this is a <b>false positive</b>. Re-run and it usually vanishes; run enough tests and you'll see some by chance.":"Correct call: there's no real effect to find."));
+    }
+    mark(); run(); window.addEventListener("resize", draw);
+  };
+
   function setupWidgets() {
     var ws = qsa(".widget"); if (!ws.length) return;
     ws.forEach(function (w) {
