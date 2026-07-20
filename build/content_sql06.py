@@ -109,6 +109,31 @@ p.append(B.concept(
  "then shows the change: East +40 then +0; West &minus;110 then +170. This single pattern answers a "
  "huge share of real \"trend\" questions."))
 
+LAB_DB = """
+CREATE TABLE sales (region TEXT, month INTEGER, amount REAL);
+INSERT INTO sales VALUES
+ ('East',1,100),('East',2,140),('East',3,140),
+ ('West',1,200),('West',2,90),('West',3,260);
+"""
+p.append(B.h2("Your turn - keep the rows, add the context", kicker="Interactive lab"))
+p.append(B.lab(
+ "For every row, add a column `region_total` = that row's region total, **without collapsing** the "
+ "rows. Return region, month, amount, region_total; order by region then month.",
+ LAB_DB,
+ "SELECT region, month, amount, SUM(amount) OVER (PARTITION BY region) AS region_total FROM sales ORDER BY region, month",
+ starter="-- a window function keeps every row\\nSELECT region, month, amount,\\n       ",
+ hint="`SUM(amount) OVER (PARTITION BY region)` gives each row its region's total while keeping all rows.",
+ title="Lab 1 - aggregate without collapsing"))
+p.append(B.lab(
+ "The interview classic: return the **top-selling month in each region** (region, month, amount). "
+ "Use a window function in a CTE, then filter. Keep ties out by using ROW_NUMBER.",
+ LAB_DB,
+ "WITH r AS (SELECT region, month, amount, ROW_NUMBER() OVER (PARTITION BY region ORDER BY amount DESC) AS rn FROM sales) SELECT region, month, amount FROM r WHERE rn = 1 ORDER BY region",
+ starter="WITH r AS (\\n    SELECT region, month, amount,\\n           ROW_NUMBER() OVER (...) AS rn\\n    FROM sales\\n)\\nSELECT ",
+ hint="Rank within each region with ROW_NUMBER() OVER (PARTITION BY region ORDER BY amount DESC), then keep rn = 1 in the outer query (you cannot filter a window function in WHERE directly).",
+ title="Lab 2 - top-N per group",
+ explain="ROW_NUMBER ranks within each region; filtering rn = 1 outside the CTE gives each region's best month."))
+
 p.append(B.keypoints([
  "A ~window function~ = `func(...) OVER (PARTITION BY … ORDER BY …)`: it computes across related rows "
  "**without collapsing** them (unlike `GROUP BY`).",

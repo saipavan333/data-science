@@ -121,6 +121,34 @@ p.append(B.tip(
  "a COUNT, an AVG), it belongs in `HAVING`. `WHERE` runs first and is also faster, so filter rows "
  "there whenever you can.", "&#10022;"))
 
+LAB_DB = """
+CREATE TABLE orders (id INTEGER, customer TEXT, category TEXT, amount REAL, country TEXT);
+INSERT INTO orders VALUES
+ (101,'Ada','Electronics',240,'US'),(102,'Blake','Apparel',45,'US'),
+ (103,'Chen','Electronics',220,'CA'),(104,'Diego','Home',130,'MX'),
+ (105,'Ada','Apparel',190,'US'),(106,'Priya','Electronics',510,'CA'),
+ (107,'Blake','Home',160,'US'),(108,'Chen','Electronics',300,'US'),
+ (109,'Sara','Apparel',NULL,'CA');
+"""
+p.append(B.h2("Your turn — aggregate it yourself", kicker="Interactive lab"))
+p.append(B.lab(
+ "Return each **category** with its number of orders and total revenue, highest revenue first. "
+ "Name the columns `category`, `orders`, `revenue`.",
+ LAB_DB,
+ "SELECT category, COUNT(*) AS orders, SUM(amount) AS revenue FROM orders GROUP BY category ORDER BY revenue DESC",
+ starter="-- orders(id, customer, category, amount, country)\\nSELECT ",
+ hint="`GROUP BY category`, then `COUNT(*)` and `SUM(amount)`. Sort with `ORDER BY revenue DESC`.",
+ title="Lab 1 - revenue per category"))
+p.append(B.lab(
+ "Now filter the groups: return only the **countries** whose **total** revenue is above 400, with "
+ "that total as `revenue`. Which clause filters a group total?",
+ LAB_DB,
+ "SELECT country, SUM(amount) AS revenue FROM orders GROUP BY country HAVING SUM(amount) > 400 ORDER BY revenue DESC",
+ starter="-- filter on a GROUP's total, not a row\\nSELECT ",
+ hint="A condition on `SUM(amount)` is about a group, so it belongs in `HAVING`, not `WHERE`.",
+ title="Lab 2 - HAVING vs WHERE",
+ explain="`HAVING SUM(amount) > 400` runs after grouping; `WHERE` couldn't see the total at all."))
+
 p.append(B.keypoints([
  "An ~aggregate~ (`COUNT`, `SUM`, `AVG`, `MIN`, `MAX`) turns many rows into one number.",
  "`COUNT(*)` counts **rows**; `COUNT(col)` counts **non-NULL** values; `SUM`/`AVG` **skip** NULLs "

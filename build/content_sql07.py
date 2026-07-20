@@ -120,6 +120,32 @@ p.append(B.concept(
  "column. `COALESCE` turned Diego's missing status into `'unknown'` and order 6's missing amount into "
  "`0`, so downstream sums and filters behave."))
 
+LAB_DB = """
+CREATE TABLE orders (id INTEGER, name TEXT, amount REAL, status TEXT, created TEXT);
+INSERT INTO orders VALUES
+ (1,'Ada',240,'paid','2025-01-14'),(2,'Blake',45,'refunded','2025-01-20'),
+ (3,'Chen',220,'paid','2025-02-03'),(4,'Diego',130,NULL,'2025-02-18'),
+ (5,'Priya',510,'paid','2025-03-09'),(6,'Blake',NULL,'pending','2025-03-22');
+"""
+p.append(B.h2("Your turn - reshape and tidy", kicker="Interactive lab"))
+p.append(B.lab(
+ "In one row, return three conditional aggregates: total revenue from `paid` orders as `paid_rev`, "
+ "total from `refunded` as `refunded_rev`, and the count of `pending` orders as `pending_ct`.",
+ LAB_DB,
+ "SELECT SUM(CASE WHEN status='paid' THEN amount ELSE 0 END) AS paid_rev, SUM(CASE WHEN status='refunded' THEN amount ELSE 0 END) AS refunded_rev, SUM(CASE WHEN status='pending' THEN 1 ELSE 0 END) AS pending_ct FROM orders",
+ starter="-- three SUM(CASE WHEN ...) expressions in one SELECT\\nSELECT ",
+ hint="`SUM(CASE WHEN status='paid' THEN amount ELSE 0 END)` sums only paid amounts; repeat the pattern for each column.",
+ title="Lab 1 - conditional aggregation (a pivot)"))
+p.append(B.lab(
+ "Return revenue per **month** from the text `created` dates. Columns `month` (like '2025-01') and "
+ "`revenue`; treat a missing amount as 0; order by month.",
+ LAB_DB,
+ "SELECT strftime('%Y-%m', created) AS month, COALESCE(SUM(amount),0) AS revenue FROM orders GROUP BY month ORDER BY month",
+ starter="-- strftime('%Y-%m', created) truncates a date to its month\\nSELECT ",
+ hint="Group by `strftime('%Y-%m', created)` and wrap the sum in `COALESCE(SUM(amount), 0)`.",
+ title="Lab 2 - group by month",
+ explain="strftime turns each date into a year-month key; COALESCE turns a NULL total into 0."))
+
 p.append(B.keypoints([
  "~CASE WHEN … THEN … ELSE … END~ is SQL's if/else &mdash; label rows, or put it **inside** SUM/"
  "COUNT to aggregate conditionally (and build pivots).",

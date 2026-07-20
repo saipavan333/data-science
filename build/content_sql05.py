@@ -108,6 +108,31 @@ p.append(B.tip(
  "CTE more than once. It's the difference between a query a teammate can read in ten seconds and one "
  "they have to reverse-engineer.", "&#10022;"))
 
+LAB_DB = """
+CREATE TABLE orders (id INTEGER, customer TEXT, category TEXT, amount REAL);
+INSERT INTO orders VALUES
+ (1,'Ada','Electronics',240),(2,'Blake','Apparel',45),(3,'Chen','Electronics',220),
+ (4,'Ada','Home',130),(5,'Priya','Electronics',510),(6,'Blake','Home',160),(7,'Chen','Apparel',90);
+"""
+p.append(B.h2("Your turn - build it in steps", kicker="Interactive lab"))
+p.append(B.lab(
+ "Using a scalar subquery, return the `customer`, `category` and `amount` of every order whose amount "
+ "is **above the overall average** order amount, biggest first.",
+ LAB_DB,
+ "SELECT customer, category, amount FROM orders WHERE amount > (SELECT AVG(amount) FROM orders) ORDER BY amount DESC",
+ starter="-- compute the average first, then compare each row to it\\nSELECT ",
+ hint="Put `(SELECT AVG(amount) FROM orders)` on the right side of a `>` in your WHERE clause.",
+ title="Lab 1 - scalar subquery"))
+p.append(B.lab(
+ "Now with a **CTE**: first total each customer's spend, then return only customers whose total is "
+ "above 300. Columns: `customer`, `total`, highest first.",
+ LAB_DB,
+ "WITH by_cust AS (SELECT customer, SUM(amount) AS total FROM orders GROUP BY customer) SELECT customer, total FROM by_cust WHERE total > 300 ORDER BY total DESC",
+ starter="WITH by_cust AS (\\n    SELECT ...\\n)\\nSELECT ",
+ hint="Define `WITH by_cust AS (SELECT customer, SUM(amount) AS total FROM orders GROUP BY customer)`, then select from it with `WHERE total > 300`.",
+ title="Lab 2 - a readable CTE",
+ explain="The CTE names the per-customer totals so the outer query reads top-to-bottom."))
+
 p.append(B.keypoints([
  "A ~subquery~ is a `SELECT` nested inside another query, run first and used as a value.",
  "A ~scalar subquery~ returns one value (use with `>`, `=`, …); a `WHERE col IN (SELECT …)` subquery "

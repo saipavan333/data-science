@@ -523,3 +523,30 @@ table.data tbody tr:hover{background:var(--paper-2)}
 .w-tbl tr.nullrow td{background:var(--amber-bg)}
 .w-grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media(max-width:620px){.w-grid2{grid-template-columns:1fr}}
+
+/* ============================ CHEATSHEET =============================== */
+.cheatsheet{margin:30px 0}
+.cs-head{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+.cs-badge{font-weight:700;font-size:10px;letter-spacing:.1em;color:#fff;background:var(--grad);
+  padding:4px 11px;border-radius:30px;flex:none}
+.cs-head h2{font-family:var(--disp);font-weight:700;font-size:24px;margin:0;letter-spacing:-.02em}
+.cs-print{margin-left:auto;font-family:var(--font);font-weight:600;font-size:12px;padding:7px 14px;
+  border-radius:9px;border:1px solid var(--line);background:var(--paper);color:var(--muted);cursor:pointer}
+.cs-print:hover{border-color:var(--indigo);color:var(--indigo-2)}
+.cs-intro{color:var(--muted);font-size:15px;margin:6px 0 18px}
+.cs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:720px){.cs-grid{grid-template-columns:1fr}}
+.cs-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;
+  box-shadow:var(--sh-1);break-inside:avoid}
+.cs-card h3{font-family:var(--disp);font-weight:600;font-size:14.5px;margin:0 0 12px;color:var(--indigo-2);
+  letter-spacing:-.01em;padding-bottom:8px;border-bottom:1px solid var(--line-2)}
+.cs-row{display:grid;grid-template-columns:minmax(38%,auto) 1fr;gap:12px;align-items:baseline;
+  padding:6px 0;border-bottom:1px dashed var(--line-2)}
+.cs-row:last-child{border-bottom:none}
+.cs-row code{font-family:var(--mono);font-size:12.2px;color:#39406B;background:var(--paper-3);
+  padding:3px 7px;border-radius:6px;border:1px solid var(--line);white-space:nowrap;overflow-x:auto;font-weight:500}
+.cs-row span{font-size:13px;color:var(--muted);line-height:1.45}
+@media print{
+  .sidebar,.topbar,.readbar,.lesson-nav,.revise-cta,.cs-print{display:none!important}
+  .cheatsheet{margin:0}.cs-grid{grid-template-columns:1fr 1fr}.cs-card{box-shadow:none}
+}

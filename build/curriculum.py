@@ -74,6 +74,11 @@ TRACKS = [
              "lede": "Pandas and SQL questions teams ask, with model answers.",
              "minutes": 15
             },
+            {"id": "py-12-cheatsheet", "num": "1.13",
+             "title": "Python, NumPy & Pandas Cheatsheet",
+             "lede": "The Foundations track on one printable page \u2014 Python, NumPy and pandas essentials.",
+             "minutes": 6, "ready": True
+            },
         ],
     },
     # ===================================================================== #
@@ -163,6 +168,11 @@ TRACKS = [
                  "A window-function walkthrough",
                  "Debugging a query out loud",
              ]
+            },
+            {"id": "sql-09-cheatsheet", "num": "2.9",
+             "title": "SQL Cheatsheet & Quick Reference",
+             "lede": "The whole track on one printable page \u2014 every clause, what it does, and the query shape.",
+             "minutes": 6, "ready": True
             },
         ],
     },
@@ -345,6 +355,11 @@ TRACKS = [
                  "Walk through the CLT and why it matters",
                  "Interpreting a confidence interval correctly",
              ]
+            },
+            {"id": "stats-13-cheatsheet", "num": "4.12",
+             "title": "Statistics & Probability Cheatsheet",
+             "lede": "Every statistical idea in the track on one printable page.",
+             "minutes": 6, "ready": True
             },
         ],
     },

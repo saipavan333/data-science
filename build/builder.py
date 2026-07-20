@@ -363,3 +363,22 @@ def widget(kind, title, caption="", height=360):
             '%s</figure>'
             % (attresc(kind), height, esc(title),
                ('<figcaption>%s</figcaption>' % inline(caption)) if caption else ''))
+
+
+# ---------------------------------------------------------------------------
+# CHEATSHEET — a scannable, printable one-page reference per track.
+# groups = [ (group_title, [ (code_snippet, plain_english), ... ] ), ... ]
+# ---------------------------------------------------------------------------
+
+def cheatsheet(title, intro, groups):
+    cards = ""
+    for gtitle, rows in groups:
+        items = ""
+        for code, desc in rows:
+            items += ('<div class="cs-row"><code>%s</code><span>%s</span></div>'
+                      % (esc(code), inline(desc)))
+        cards += ('<div class="cs-card"><h3>%s</h3>%s</div>' % (esc(gtitle), items))
+    intro_html = ('<p class="cs-intro">%s</p>' % inline(intro)) if intro else ""
+    return ('<div class="cheatsheet"><div class="cs-head"><span class="cs-badge">&#9636; CHEATSHEET</span>'
+            '<h2>%s</h2><button class="cs-print" onclick="window.print()">Print</button></div>'
+            '%s<div class="cs-grid">%s</div></div>' % (esc(title), intro_html, cards))

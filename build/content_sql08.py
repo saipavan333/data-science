@@ -145,6 +145,32 @@ p.append(B.table(
    "Use `COUNT(child.id)` instead"]],
  caption="The four bugs behind most broken analytics queries"))
 
+LAB_DB = """
+CREATE TABLE employees (id INTEGER, name TEXT, dept TEXT, salary REAL);
+INSERT INTO employees VALUES
+ (1,'Ada','Engineering',150),(2,'Blake','Engineering',120),(3,'Chen','Engineering',150),
+ (4,'Diego','Sales',90),(5,'Priya','Sales',130),(6,'Sara','Sales',110),(7,'Tom','Marketing',95);
+"""
+p.append(B.h2("Your turn - the interview patterns", kicker="Interactive lab"))
+p.append(B.lab(
+ "The most-asked SQL question: return the **top 2 earners in each department** (dept, name, salary), "
+ "keeping people tied at a rank. Order by dept, then salary highest first.",
+ LAB_DB,
+ "WITH r AS (SELECT name, dept, salary, DENSE_RANK() OVER (PARTITION BY dept ORDER BY salary DESC) AS rnk FROM employees) SELECT dept, name, salary FROM r WHERE rnk <= 2 ORDER BY dept, salary DESC",
+ starter="WITH r AS (\\n    SELECT name, dept, salary,\\n           DENSE_RANK() OVER (...) AS rnk\\n    FROM employees\\n)\\nSELECT ",
+ hint="Rank within each department: DENSE_RANK() OVER (PARTITION BY dept ORDER BY salary DESC). Keep rnk <= 2 in the outer query.",
+ title="Lab 1 - top-N per group",
+ explain="DENSE_RANK keeps everyone tied at a position, so Engineering's two 150s both count as rank 1."))
+p.append(B.lab(
+ "Return the **second-highest distinct salary** in the whole company as `second_highest`. Ties at "
+ "the top must not count twice.",
+ LAB_DB,
+ "WITH r AS (SELECT salary, DENSE_RANK() OVER (ORDER BY salary DESC) AS rnk FROM employees) SELECT DISTINCT salary AS second_highest FROM r WHERE rnk = 2",
+ starter="-- DENSE_RANK treats the two top-tied salaries as one rank\\nWITH r AS (\\n    SELECT ",
+ hint="DENSE_RANK() OVER (ORDER BY salary DESC) gives the two 150s rank 1 and the next distinct salary rank 2. Select DISTINCT salary WHERE rnk = 2.",
+ title="Lab 2 - Nth-highest",
+ explain="DENSE_RANK collapses ties so 'second highest' means the second distinct value, which is what the phrase means."))
+
 p.append(B.keypoints([
  "**Nth-highest** &rarr; `DENSE_RANK` in a CTE, filter `rnk = N` outside (ties give the same rank, no "
  "gaps).",

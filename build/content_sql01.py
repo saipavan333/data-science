@@ -127,6 +127,24 @@ p.append(B.concept(
  "by person is the next lesson). Change `DESC` to `ASC`, or `'US'` to `'CA'`, hit Run, and watch the "
  "answer change."))
 
+LAB_DB = """
+CREATE TABLE orders (id INTEGER, customer TEXT, category TEXT, amount REAL, country TEXT);
+INSERT INTO orders VALUES
+ (101,'Ada','Electronics',240,'US'),(102,'Blake','Apparel',45,'US'),
+ (103,'Chen','Electronics',220,'CA'),(104,'Diego','Home',130,'MX'),
+ (105,'Ada','Apparel',190,'US'),(106,'Priya','Electronics',510,'CA'),
+ (107,'Blake','Home',160,'US'),(108,'Chen','Electronics',300,'US');
+"""
+p.append(B.h2("Your turn - write your first query", kicker="Interactive lab"))
+p.append(B.lab(
+ "Return the `customer` and `amount` of every **Electronics** order, biggest first.",
+ LAB_DB,
+ "SELECT customer, amount FROM orders WHERE category = 'Electronics' ORDER BY amount DESC",
+ starter="-- orders(id, customer, category, amount, country)\\nSELECT ",
+ hint="Pick the two columns after SELECT, filter with WHERE category = 'Electronics', and sort with ORDER BY amount DESC.",
+ title="Lab 1 - your first SELECT",
+ explain="Text values need single quotes; DESC puts the largest amount first."))
+
 p.append(B.keypoints([
  "~SQL~ is how you pull data out of ~databases~, where real-world data lives. It's a near-universal, "
  "interviewed job skill.",
