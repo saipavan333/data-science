@@ -356,11 +356,15 @@
           r: Math.random() * 1.7 + 1.1, seed: Math.random() * 6.28, sp: 0.4 + Math.random() * 0.7 });
       }
     }
-    function resize() {
-      var r = cv.getBoundingClientRect(); if (!r.width) return;
+    function measure() {
+      var r = cv.getBoundingClientRect();
+      var w = Math.round(r.width), h = Math.round(r.height);
+      if (w < 2 || h < 2) return false;                 // not laid out yet — caller will retry
+      if (w === W && h === H && parts.length) return true;
       dpr = Math.min(window.devicePixelRatio || 1, 2);
-      W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr;
+      W = w; H = h; cv.width = W * dpr; cv.height = H * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0); init();
+      return true;
     }
     function guide() {
       ctx.beginPath();
@@ -387,17 +391,26 @@
         if (bell(p.nx) > 0.55) { ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 2.4, 0, 6.2832); ctx.fillStyle = color(p.nx, 0.06); ctx.fill(); }
       }
     }
-    function frame() { t += 0.006; draw(true); raf = requestAnimationFrame(frame); }
+    function frame() {
+      raf = 0;
+      if (!measure()) { raf = requestAnimationFrame(frame); return; }  // keep retrying until sized
+      if (reduce) { draw(false); return; }                            // static designed frame
+      t += 0.006; draw(true);
+      raf = requestAnimationFrame(frame);
+    }
+    function start() { if (!raf) raf = requestAnimationFrame(frame); }
     function stop() { if (raf) cancelAnimationFrame(raf); raf = 0; }
 
     var host = cv.parentElement;
     host.addEventListener("mousemove", function (e) { var r = cv.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; mouse.on = true; });
     host.addEventListener("mouseleave", function () { mouse.on = false; mouse.x = mouse.y = -1e9; });
-    window.addEventListener("resize", function () { resize(); if (reduce) draw(false); });
-    document.addEventListener("visibilitychange", function () { if (document.hidden) stop(); else if (!reduce && !raf) frame(); });
+    window.addEventListener("resize", function () { if (measure() && reduce) draw(false); });
+    document.addEventListener("visibilitychange", function () { if (document.hidden) stop(); else start(); });
+    window.addEventListener("pageshow", function () { stop(); start(); });   // survive bfcache back-navigation
+    if (window.ResizeObserver) { try { new ResizeObserver(function () { if (measure() && reduce) draw(false); }).observe(cv); } catch (e) {} }
+    if (document.fonts && document.fonts.ready) { document.fonts.ready.then(function () { if (measure() && reduce) draw(false); }); }
 
-    resize();
-    if (reduce) { draw(false); } else { setTimeout(frame, 60); }
+    start();
   }
 
   /* --------------------- Pyodide in-browser runner ---------------------- */
@@ -889,13 +902,74 @@
     render(); window.addEventListener("resize", render);
   };
 
+
+  /* Decision-threshold explorer: precision vs recall */
+  WIDGETS["threshold"] = function (host) {
+    var data = [
+      {p:0.95,y:1},{p:0.88,y:1},{p:0.82,y:1},{p:0.71,y:1},{p:0.66,y:1},{p:0.58,y:1},{p:0.52,y:1},{p:0.44,y:1},
+      {p:0.62,y:0},{p:0.48,y:0},{p:0.41,y:0},{p:0.35,y:0},{p:0.28,y:0},{p:0.19,y:0},{p:0.12,y:0},{p:0.06,y:0}
+    ];
+    var thr = 0.5;
+    host.innerHTML =
+      '<div class="w-row"><span class="w-lab">DECISION THRESHOLD</span>' +
+      '<input class="w-slider" type="range" min="0.05" max="0.95" step="0.01" value="0.5"><span class="w-val">0.50</span></div>' +
+      '<canvas class="w-canvas" style="height:150px"></canvas>' +
+      '<div class="w-grid2" style="margin-top:12px">' +
+      '<div class="w-out" id="th-cnts"></div><div class="w-out" id="th-met"></div></div>';
+    var cv = qs("canvas", host), slider = qs(".w-slider", host), val = qs(".w-val", host);
+    var cnts = qs("#th-cnts", host), met = qs("#th-met", host);
+    slider.addEventListener("input", function () { thr = +slider.value; val.textContent = thr.toFixed(2); render(); });
+    function render() {
+      var r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2), W = r.width, H = r.height;
+      if (W < 2) return;
+      cv.width = W * dpr; cv.height = H * dpr; var x = cv.getContext("2d"); x.setTransform(dpr, 0, 0, dpr, 0, 0);
+      x.clearRect(0, 0, W, H);
+      var padL = 10, padR = 10, midY = H / 2;
+      function X(p) { return padL + p * (W - padL - padR); }
+      x.fillStyle = "rgba(18,169,123,.10)"; x.fillRect(X(thr), 0, W - padR - X(thr), H);
+      x.strokeStyle = "rgba(154,166,192,.3)"; x.beginPath(); x.moveTo(padL, midY); x.lineTo(W - padR, midY); x.stroke();
+      var tp=0,fp=0,fn=0,tn=0;
+      data.forEach(function (d, i) {
+        var predPos = d.p >= thr;
+        if (d.y === 1 && predPos) tp++; else if (d.y === 0 && predPos) fp++;
+        else if (d.y === 1 && !predPos) fn++; else tn++;
+        var yy = midY + (d.y === 1 ? -1 : 1) * (14 + (i % 4) * 9);
+        x.beginPath(); x.arc(X(d.p), yy, 6, 0, 6.283);
+        x.fillStyle = d.y === 1 ? "rgba(18,169,123,.9)" : "rgba(239,62,104,.9)";
+        x.fill();
+        if (predPos) { x.lineWidth = 2.5; x.strokeStyle = "#F5C542"; x.stroke(); }
+      });
+      x.strokeStyle = "#EA9A0B"; x.lineWidth = 2.5; x.setLineDash([5, 4]);
+      x.beginPath(); x.moveTo(X(thr), 0); x.lineTo(X(thr), H); x.stroke(); x.setLineDash([]);
+      x.fillStyle = "#9AA6C0"; x.font = "600 10px Inter, sans-serif";
+      x.fillText("predict FAIL", padL + 4, 12); x.fillText("predict PASS (ringed)", X(thr) + 6, 12);
+      var prec = tp + fp ? tp / (tp + fp) : 0, rec = tp + fn ? tp / (tp + fn) : 0, acc = (tp + tn) / data.length;
+      cnts.className = "w-out";
+      cnts.innerHTML = "<b>At threshold " + thr.toFixed(2) + ":</b><br>" +
+        "&#9679; True positives: <b>" + tp + "</b> &middot; False positives: <b>" + fp + "</b><br>" +
+        "&#9679; False negatives: <b>" + fn + "</b> &middot; True negatives: <b>" + tn + "</b>";
+      met.className = "w-out";
+      met.innerHTML = "Precision = <b>" + (prec * 100).toFixed(0) + "%</b> (of predicted pass, how many really pass)<br>" +
+        "Recall = <b>" + (rec * 100).toFixed(0) + "%</b> (of real passes, how many we caught)<br>" +
+        "Accuracy = <b>" + (acc * 100).toFixed(0) + "%</b>. " +
+        (thr < 0.4 ? "Low threshold &rarr; catch almost everyone (high recall) but many false alarms (low precision)."
+         : thr > 0.65 ? "High threshold &rarr; only the sure cases (high precision) but you miss real ones (low recall)."
+         : "Move the slider: precision and recall trade off against each other &mdash; you can't max both.");
+    }
+    render(); window.addEventListener("resize", render);
+  };
+
   function setupWidgets() {
-    qsa(".widget").forEach(function (w) {
+    var ws = qsa(".widget"); if (!ws.length) return;
+    ws.forEach(function (w) {
       var kind = w.getAttribute("data-widget"), body = qs(".w-body", w), fn = WIDGETS[kind];
       if (!fn) return;
       body.innerHTML = "";
       try { fn(body); } catch (e) { body.textContent = "(this explorer could not load)"; }
     });
+    var kick = function () { try { window.dispatchEvent(new Event("resize")); } catch (e) {} };
+    requestAnimationFrame(kick); setTimeout(kick, 300);        // re-render once layout/fonts settle
+    if (window.ResizeObserver) { try { var ro = new ResizeObserver(kick); qsa(".w-canvas").forEach(function (c) { ro.observe(c); }); } catch (e) {} }
   }
 
 })();
