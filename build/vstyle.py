@@ -2,7 +2,7 @@ import os, subprocess
 import numpy as np
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-IMG = "/sessions/zen-pensive-thompson/mnt/Tutorials/data-science-academy/assets/img"
+IMG = "/sessions/zen-pensive-thompson/mnt/data-science-academy/assets/img"
 os.makedirs(IMG, exist_ok=True)
 INDIGO, INDIGO_DK, INDIGO_BG = "#3b53d6", "#2a3da6", "#eef1fd"
 TEAL, TEAL_BG = "#0e8f8a", "#e3f5f3"

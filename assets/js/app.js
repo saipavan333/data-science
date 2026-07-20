@@ -820,6 +820,75 @@
     render(); window.addEventListener("resize", render);
   };
 
+
+  /* Least-squares regression: drag points, watch the line re-solve */
+  WIDGETS["regression"] = function (host) {
+    var start = [[1,2.2],[2,3.5],[3,3.1],[4,5.2],[5,4.6],[6,6.4],[7,6.1],[8,7.8],[9,7.2],[10,9.0]];
+    var pts = start.map(function (p) { return p.slice(); }), drag = -1;
+    host.innerHTML =
+      '<canvas class="w-canvas" style="height:340px;cursor:grab;touch-action:none"></canvas>' +
+      '<div class="w-row" style="margin-top:12px"><button class="w-btn w-reset">Reset points</button>' +
+      '<span class="w-lab" style="margin-left:auto">Drag any dot &mdash; the line re-solves instantly</span></div>' +
+      '<div class="w-out"></div>';
+    var cv = qs("canvas", host), out = qs(".w-out", host);
+    qs(".w-reset", host).addEventListener("click", function () { pts = start.map(function (p) { return p.slice(); }); render(); });
+    var lo = 0, hi = 11, padL = 24, padB = 26, padT = 14, padR = 14;
+    function Wd() { return cv.getBoundingClientRect().width; }
+    function Hd() { return cv.getBoundingClientRect().height; }
+    function px(x) { return padL + (x - lo) / (hi - lo) * (Wd() - padL - padR); }
+    function py(y) { return Hd() - padB - (y - lo) / (hi - lo) * (Hd() - padB - padT); }
+    function ix(sx) { return lo + (sx - padL) / (Wd() - padL - padR) * (hi - lo); }
+    function iy(sy) { return lo + (Hd() - padB - sy) / (Hd() - padB - padT) * (hi - lo); }
+    function fit() {
+      var n = pts.length, mx = 0, my = 0;
+      pts.forEach(function (p) { mx += p[0]; my += p[1]; }); mx /= n; my /= n;
+      var num = 0, den = 0;
+      pts.forEach(function (p) { num += (p[0] - mx) * (p[1] - my); den += (p[0] - mx) * (p[0] - mx); });
+      var b = den ? num / den : 0, a = my - b * mx, sse = 0;
+      pts.forEach(function (p) { var e = p[1] - (a + b * p[0]); sse += e * e; });
+      return { a: a, b: b, sse: sse };
+    }
+    function pos(ev) { var r = cv.getBoundingClientRect(); return [ev.clientX - r.left, ev.clientY - r.top]; }
+    cv.addEventListener("pointerdown", function (ev) {
+      var p = pos(ev);
+      for (var i = 0; i < pts.length; i++) {
+        if (Math.hypot(px(pts[i][0]) - p[0], py(pts[i][1]) - p[1]) < 18) {
+          drag = i; try { cv.setPointerCapture(ev.pointerId); } catch (e) {} cv.style.cursor = "grabbing"; break;
+        }
+      }
+    });
+    cv.addEventListener("pointermove", function (ev) {
+      if (drag < 0) return;
+      var p = pos(ev);
+      pts[drag] = [Math.max(lo + 0.3, Math.min(hi - 0.3, ix(p[0]))), Math.max(lo + 0.2, Math.min(hi - 0.2, iy(p[1])))];
+      render();
+    });
+    function end() { drag = -1; cv.style.cursor = "grab"; }
+    cv.addEventListener("pointerup", end); cv.addEventListener("pointercancel", end);
+    function render() {
+      var w = Wd(), h = Hd(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+      cv.width = w * dpr; cv.height = h * dpr;
+      var x = cv.getContext("2d"); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, w, h);
+      x.strokeStyle = "rgba(154,166,192,.35)"; x.lineWidth = 1;
+      x.beginPath(); x.moveTo(padL, padT); x.lineTo(padL, h - padB); x.lineTo(w - padR, h - padB); x.stroke();
+      var f = fit();
+      x.strokeStyle = "rgba(239,62,104,.7)"; x.lineWidth = 1.5; x.setLineDash([4, 3]);
+      pts.forEach(function (p) { var yp = f.a + f.b * p[0]; x.beginPath(); x.moveTo(px(p[0]), py(p[1])); x.lineTo(px(p[0]), py(yp)); x.stroke(); });
+      x.setLineDash([]);
+      x.strokeStyle = "#6E67FF"; x.lineWidth = 2.5;
+      x.beginPath(); x.moveTo(px(lo), py(f.a + f.b * lo)); x.lineTo(px(hi), py(f.a + f.b * hi)); x.stroke();
+      pts.forEach(function (p) {
+        x.beginPath(); x.arc(px(p[0]), py(p[1]), 6, 0, 6.283);
+        x.fillStyle = "#C7C9FF"; x.fill(); x.lineWidth = 2; x.strokeStyle = "#6E67FF"; x.stroke();
+      });
+      out.className = "w-out";
+      out.innerHTML = "Best-fit line: <b>&#375; = " + f.a.toFixed(2) + " + " + f.b.toFixed(2) +
+        "&middot;x</b> &nbsp;&middot;&nbsp; sum of squared residuals: <b>" + f.sse.toFixed(2) +
+        "</b>. Drag a point far off the trend and watch the error jump &mdash; least squares always re-picks the line that makes this number as small as possible.";
+    }
+    render(); window.addEventListener("resize", render);
+  };
+
   function setupWidgets() {
     qsa(".widget").forEach(function (w) {
       var kind = w.getAttribute("data-widget"), body = qs(".w-body", w), fn = WIDGETS[kind];
