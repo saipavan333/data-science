@@ -959,6 +959,72 @@
     render(); window.addEventListener("resize", render);
   };
 
+
+  /* k-means: step through Lloyd's algorithm */
+  WIDGETS["kmeans"] = function (host) {
+    var blobs = [[-2.2,-1.2],[2.2,-1.0],[0,2.2]], pts = [];
+    blobs.forEach(function (b) { for (var i = 0; i < 26; i++) pts.push([b[0] + (Math.random()-0.5)*2.4, b[1] + (Math.random()-0.5)*2.4]); });
+    var K = 3, cols = ["#5B54F0","#0FB5C4","#EA9A0B"], cents = [], assign = [], iter = 0, moved = true;
+    function seed() {
+      cents = []; for (var i = 0; i < K; i++) { var pp = pts[(Math.random()*pts.length)|0]; cents.push([pp[0]+(Math.random()-0.5)*2, pp[1]+(Math.random()-0.5)*2]); }
+      assign = pts.map(function(){return -1;}); iter = 0; moved = true; render();
+    }
+    host.innerHTML =
+      '<canvas class="w-canvas" style="height:300px"></canvas>' +
+      '<div class="w-row" style="margin-top:12px"><button class="w-btn primary w-step">Step &#9656;</button>' +
+      '<button class="w-btn w-reset">New random start</button><span class="w-lab" id="km-it" style="margin-left:auto"></span></div>' +
+      '<div class="w-out" id="km-out"></div>';
+    var cv = qs("canvas", host), itEl = qs("#km-it", host), out = qs("#km-out", host);
+    qs(".w-reset", host).addEventListener("click", seed);
+    qs(".w-step", host).addEventListener("click", step);
+    function step() {
+      // 1) assign each point to nearest centroid
+      var newAssign = pts.map(function (p) {
+        var best = 0, bd = 1e9;
+        for (var c = 0; c < K; c++) { var dx = p[0]-cents[c][0], dy = p[1]-cents[c][1], d = dx*dx+dy*dy; if (d < bd) { bd = d; best = c; } }
+        return best;
+      });
+      // 2) move each centroid to the mean of its points
+      moved = false;
+      for (var c = 0; c < K; c++) {
+        var sx = 0, sy = 0, n = 0;
+        pts.forEach(function (p, i) { if (newAssign[i] === c) { sx += p[0]; sy += p[1]; n++; } });
+        if (n) { var nx = sx/n, ny = sy/n; if (Math.abs(nx-cents[c][0])+Math.abs(ny-cents[c][1]) > 0.001) moved = true; cents[c] = [nx, ny]; }
+      }
+      assign = newAssign; iter++; render();
+    }
+    function render() {
+      var r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2), W = r.width, H = r.height;
+      if (W < 2) return;
+      cv.width = W*dpr; cv.height = H*dpr; var x = cv.getContext("2d"); x.setTransform(dpr,0,0,dpr,0,0); x.clearRect(0,0,W,H);
+      var lo=-4.5, hi=4.5, loy=-3.4, hiy=3.8, pad=14;
+      function X(v){return pad+(v-lo)/(hi-lo)*(W-2*pad);} function Y(v){return H-pad-(v-loy)/(hiy-loy)*(H-2*pad);}
+      pts.forEach(function (p, i) {
+        var c = assign[i];
+        x.beginPath(); x.arc(X(p[0]), Y(p[1]), 5, 0, 6.283);
+        x.fillStyle = c < 0 ? "rgba(154,166,192,.7)" : cols[c].replace(")", "").replace("#","") && cols[c];
+        if (c < 0) x.fillStyle = "rgba(154,166,192,.6)"; else x.fillStyle = cols[c];
+        x.globalAlpha = 0.85; x.fill(); x.globalAlpha = 1;
+      });
+      cents.forEach(function (ce, c) {
+        x.beginPath(); x.moveTo(X(ce[0])-8, Y(ce[1])-8); x.lineTo(X(ce[0])+8, Y(ce[1])+8);
+        x.moveTo(X(ce[0])+8, Y(ce[1])-8); x.lineTo(X(ce[0])-8, Y(ce[1])+8);
+        x.strokeStyle = cols[c]; x.lineWidth = 4; x.stroke();
+        x.beginPath(); x.moveTo(X(ce[0])-8, Y(ce[1])-8); x.lineTo(X(ce[0])+8, Y(ce[1])+8);
+        x.moveTo(X(ce[0])+8, Y(ce[1])-8); x.lineTo(X(ce[0])-8, Y(ce[1])+8);
+        x.strokeStyle = "#0A0E1A"; x.lineWidth = 1.5; x.stroke();
+      });
+      itEl.textContent = "iteration " + iter;
+      out.className = "w-out";
+      out.innerHTML = iter === 0
+        ? "Three centres (the big <b>&times;</b>) start in random spots and the points are unassigned. Press <b>Step</b> to run one round: assign every point to its nearest centre, then move each centre to the average of its points."
+        : (moved ? "<b>Iteration " + iter + ".</b> Each point took the colour of its nearest centre, then the centres slid to the middle of their points. Keep stepping &mdash; watch them lock onto the three groups."
+                 : "<b>Converged after " + iter + " iterations.</b> The centres stopped moving, so the assignment is stable. That's k-means done &mdash; try <b>New random start</b> to see it sometimes settle differently.");
+    }
+    seed();
+    window.addEventListener("resize", render);
+  };
+
   function setupWidgets() {
     var ws = qsa(".widget"); if (!ws.length) return;
     ws.forEach(function (w) {

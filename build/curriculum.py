@@ -632,6 +632,11 @@ TRACKS = [
                  "Explain cross-validation",
              ]
             },
+            {"id": "ml-09-cheatsheet", "num": "8.9",
+             "title": "Machine Learning Cheatsheet",
+             "lede": "The whole Classical ML track on one printable page \u2014 models, workflow, and traps.",
+             "minutes": 6, "ready": True
+            },
         ],
     },
     # ===================================================================== #
