@@ -541,6 +541,18 @@
       function setMsg(kind, html) { msg.className = "lab-msg show " + kind; msg.innerHTML = html; }
 
       function exec(after) {
+        // "Your turn" guard: if the learner hasn't written anything yet, nudge
+        // gently instead of running the blank starter and throwing a syntax error.
+        var typed = codeEl.value.trim();
+        if (typed === "" || typed === starter.trim()) {
+          outBox.classList.remove("show");
+          var cue = lang === "py" ? "<code>answer = …</code>" : "<code>SELECT …</code>";
+          setMsg("info", "<b>✎ Your turn — this lab is yours to solve.</b> Write your " +
+            (lang === "py" ? "code" : "query") + " in the editor above (complete the " + cue +
+            " line), then press <b>Run</b>. Stuck? <b>Hint</b> and <b>Solution</b> are right there.");
+          try { codeEl.focus(); } catch (e) {}
+          return;
+        }
         var btns = qsa(".lab-btn", lab);
         btns.forEach(function (b) { b.disabled = true; });
         setMsg("info", "Running…");

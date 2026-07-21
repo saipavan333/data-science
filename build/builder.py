@@ -25,7 +25,7 @@ def inline(text):
     text = text.replace("\\$", "$")          # \$ -> $ (un-escape dollars)
     text = esc(text)
     text = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r'<a href="\2">\1</a>', text)
-    text = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", text)
+    text = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text)  # non-greedy: tolerates nested *italic* and stray *
     text = re.sub(r"~([^~]+)~", r'<span class="term">\1</span>', text)
     text = re.sub(r"(?<![*\w])\*([^*\n]+)\*(?!\w)", r"<em>\1</em>", text)
     def unstash(m):
