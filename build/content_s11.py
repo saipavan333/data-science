@@ -100,6 +100,7 @@ p.append(B.concept(
  "zero. No single correlation number can be trusted without a picture &mdash; which is why every "
  "EDA (Track 5) starts with scatterplots."))
 
+p.append(B.widget("correlation", "Feel what a correlation looks like", "Slide r from &minus;1 to +1 and watch the scatter tighten toward a line or dissolve into a cloud &mdash; a picture of what each value of r actually means."))
 p.append(B.keypoints([
  "~Pearson's r~ (&minus;1 to +1) measures **linear** association: sign = direction, magnitude = "
  "strength; it is **blind to curves**.",

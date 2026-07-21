@@ -1000,3 +1000,23 @@ TRACKS = [
         ],
     },
 ]
+
+# --- auto-append a printable cheatsheet lesson to tracks that lacked one ---
+_CHEATS = {
+    "toolkit": ("tool-07-cheat",  "The Toolkit Cheatsheet"),
+    "eda":     ("eda-11-cheat",   "EDA & Visualization Cheatsheet"),
+    "causal":  ("causal-05-cheat","Causal Inference Cheatsheet"),
+    "fe":      ("fe-07-cheat",    "Feature Engineering Cheatsheet"),
+    "eval":    ("eval-06-cheat",  "Model Evaluation Cheatsheet"),
+    "mlops":   ("mlops-06-cheat", "MLOps Cheatsheet"),
+    "comm":    ("comm-05-cheat",  "Communication Cheatsheet"),
+}
+for _t in TRACKS:
+    _c = _CHEATS.get(_t["id"])
+    if _c:
+        _n = len(_t["lessons"]) + 1
+        _t["lessons"].append({
+            "id": _c[0], "num": "%d.%d" % (_t["num"], _n), "title": _c[1],
+            "lede": "One printable page: the whole track at a glance.",
+            "minutes": 6, "ready": False, "outline": ["Reference card"],
+        })

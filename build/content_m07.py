@@ -102,6 +102,7 @@ p.append(B.pylab(
  explain="The mean of the fold scores is a far more trustworthy estimate than any single split, and "
          "it's the number you'd use to compare against another model."))
 
+p.append(B.widget("bias-variance", "The bias\u2013variance tradeoff, live", "Slide model complexity: training error keeps falling while test error traces its U-shape. The sweet spot is the dip in the rose curve, not the lowest train error."))
 p.append(B.keypoints([
  "A single train/test split wastes data and is a coin-flip; ~cross-validation~ gives a stable "
  "estimate using **all** the data.",

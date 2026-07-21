@@ -110,6 +110,7 @@ p.append(B.callout("warn", "Mean or median? A rule you can trust",
     "both and plot the distribution — if they disagree, the distribution is trying to tell you "
     "something.", "&#9888;"))
 
+p.append(B.widget("mean-median", "Why the median resists outliers", "Drag the amber outlier to the right and watch the mean chase it while the median barely moves &mdash; robustness you can see."))
 p.append(B.keypoints([
     "**Center**: mean (balance point, uses every value, outlier-sensitive), median (the middle, "
     "robust), mode (most common, the only center for categories).",

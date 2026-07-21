@@ -36,6 +36,7 @@
     setupHero();
     setupLabs();
     setupWidgets();
+    setupGlossaryTips();
     window.scrollTo(0, 0);
   });
 
@@ -1104,6 +1105,126 @@
     mark(); run(); window.addEventListener("resize", draw);
   };
 
+  /* Normal distribution explorer */
+  WIDGETS["normal"] = function (host) {
+    host.innerHTML =
+      '<div class="w-row"><span class="w-lab">mean &mu;</span><input class="w-slider" id="wn-mu" type="range" min="-3" max="3" step="0.1" value="0"><span class="w-val" id="wn-muv">0.0</span></div>' +
+      '<div class="w-row"><span class="w-lab">std &sigma;</span><input class="w-slider" id="wn-sd" type="range" min="0.4" max="2.5" step="0.05" value="1"><span class="w-val" id="wn-sdv">1.00</span></div>' +
+      '<canvas class="w-canvas" style="height:240px"></canvas><div class="w-out"></div>';
+    var cv = qs("canvas", host), out = qs(".w-out", host),
+        mu = qs("#wn-mu", host), sd = qs("#wn-sd", host), muv = qs("#wn-muv", host), sdv = qs("#wn-sdv", host);
+    function draw() {
+      var r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2), W = r.width, H = r.height;
+      if (W < 2) return;
+      cv.width = W * dpr; cv.height = H * dpr; var x = cv.getContext("2d"); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
+      var m = +mu.value, s = +sd.value; muv.textContent = m.toFixed(1); sdv.textContent = s.toFixed(2);
+      var padB = 24, padT = 12, x0 = 10, x1 = W - 10, y0 = H - padB, y1 = padT, xmin = -6, xmax = 6;
+      function sx(v) { return x0 + (v - xmin) / (xmax - xmin) * (x1 - x0); }
+      function nd(v) { return Math.exp(-0.5 * Math.pow((v - m) / s, 2)) / (s * Math.sqrt(2 * Math.PI)); }
+      var maxPeak = 1 / (0.4 * Math.sqrt(2 * Math.PI));
+      function sy(d) { return y0 - d / maxPeak * (y0 - y1) * 0.95; }
+      function region(a, b, col) { x.fillStyle = col; x.beginPath(); x.moveTo(sx(a), y0);
+        for (var v = a; v <= b; v += 0.05) x.lineTo(sx(v), sy(nd(v))); x.lineTo(sx(b), y0); x.closePath(); x.fill(); }
+      region(m - 2 * s, m + 2 * s, "rgba(15,181,196,.24)");
+      region(m - s, m + s, "rgba(110,103,255,.34)");
+      x.strokeStyle = "rgba(154,166,192,.34)"; x.lineWidth = 1; x.beginPath(); x.moveTo(x0, y0); x.lineTo(x1, y0); x.stroke();
+      x.strokeStyle = "#8983FF"; x.lineWidth = 2.6; x.beginPath();
+      for (var v = xmin; v <= xmax; v += 0.03) { var px = sx(v), py = sy(nd(v)); if (v === xmin) x.moveTo(px, py); else x.lineTo(px, py); } x.stroke();
+      x.strokeStyle = "#EF3E68"; x.setLineDash([4, 4]); x.beginPath(); x.moveTo(sx(m), y0); x.lineTo(sx(m), sy(nd(m))); x.stroke(); x.setLineDash([]);
+      x.fillStyle = "#9AA6C0"; x.font = "11px Inter, sans-serif"; x.textAlign = "center";
+      [-4, -2, 0, 2, 4].forEach(function (t) { x.fillText(String(t), sx(t), y0 + 15); });
+      out.className = "w-out true";
+      out.innerHTML = "&mu; = <b>" + m.toFixed(1) + "</b>, &sigma; = <b>" + s.toFixed(2) + "</b>. The <b style='color:#5B54F0'>indigo</b> band is &mu;&plusmn;1&sigma; (~68% of the data); the <b style='color:#0FB5C4'>teal</b> band is &mu;&plusmn;2&sigma; (~95%). Move &mu; to <b>shift</b> the curve, &sigma; to <b>widen or sharpen</b> it &mdash; it's always the same bell.";
+    }
+    mu.addEventListener("input", draw); sd.addEventListener("input", draw); window.addEventListener("resize", draw); draw();
+  };
+
+  /* Correlation explorer */
+  WIDGETS["correlation"] = function (host) {
+    host.innerHTML =
+      '<div class="w-row"><span class="w-lab">correlation r</span><input class="w-slider" id="wc-r" type="range" min="-1" max="1" step="0.05" value="0.7"><span class="w-val" id="wc-rv">0.70</span></div>' +
+      '<canvas class="w-canvas" style="height:280px"></canvas><div class="w-out"></div>';
+    var cv = qs("canvas", host), out = qs(".w-out", host), rr = qs("#wc-r", host), rv = qs("#wc-rv", host);
+    var N = 90, zx = [], zy = [], s = 12345;
+    function rnd() { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; }
+    function gauss() { var u = rnd() || 1e-9, v = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+    for (var i = 0; i < N; i++) { zx.push(gauss()); zy.push(gauss()); }
+    function draw() {
+      var r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2), W = r.width, H = r.height; if (W < 2) return;
+      cv.width = W * dpr; cv.height = H * dpr; var x = cv.getContext("2d"); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
+      var rho = +rr.value; rv.textContent = rho.toFixed(2);
+      var pad = 24, x0 = pad, x1 = W - pad, y0 = H - pad, y1 = pad;
+      function sx(v) { return x0 + (v + 3) / 6 * (x1 - x0); } function sy(v) { return y0 - (v + 3) / 6 * (y0 - y1); }
+      x.strokeStyle = "rgba(154,166,192,.34)"; x.lineWidth = 1; x.strokeRect(x0, y1, x1 - x0, y0 - y1);
+      var k = Math.sqrt(Math.max(0, 1 - rho * rho));
+      x.fillStyle = "rgba(140,133,255,.82)";
+      for (var i = 0; i < N; i++) { var px = sx(zx[i]), py = sy(rho * zx[i] + k * zy[i]); x.beginPath(); x.arc(px, py, 3.4, 0, 7); x.fill(); }
+      var desc = rho > 0.5 ? "strong positive" : rho > 0.15 ? "weak positive" : rho > -0.15 ? "basically none" : rho > -0.5 ? "weak negative" : "strong negative";
+      out.className = "w-out " + (Math.abs(rho) > 0.5 ? "true" : "unknown");
+      out.innerHTML = "r = <b>" + rho.toFixed(2) + "</b> &mdash; a <b>" + desc + "</b> linear relationship. Sign is direction, magnitude is how tightly the cloud hugs a line. At r = 0 it's a shapeless blob; near &plusmn;1 it's nearly a straight line. Remember: r only sees <b>straight-line</b> association.";
+    }
+    rr.addEventListener("input", draw); window.addEventListener("resize", draw); draw();
+  };
+
+  /* Bias-variance / model-complexity explorer */
+  WIDGETS["bias-variance"] = function (host) {
+    host.innerHTML =
+      '<div class="w-row"><span class="w-lab">model complexity</span><input class="w-slider" id="wb-c" type="range" min="1" max="15" step="1" value="4"><span class="w-val" id="wb-cv">4</span></div>' +
+      '<canvas class="w-canvas" style="height:260px"></canvas><div class="w-out"></div>';
+    var cv = qs("canvas", host), out = qs(".w-out", host), cc = qs("#wb-c", host), cvl = qs("#wb-cv", host);
+    function trainErr(c) { return 0.9 * Math.exp(-c / 3) + 0.05; }
+    function testErr(c) { return 0.9 * Math.exp(-c / 3) + 0.05 + 0.012 * Math.pow(Math.max(0, c - 4), 2); }
+    function draw() {
+      var r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2), W = r.width, H = r.height; if (W < 2) return;
+      cv.width = W * dpr; cv.height = H * dpr; var x = cv.getContext("2d"); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
+      var c = +cc.value; cvl.textContent = c;
+      var padL = 40, padR = 12, padB = 26, padT = 14, x0 = padL, x1 = W - padR, y0 = H - padB, y1 = padT;
+      function sx(v) { return x0 + (v - 1) / 14 * (x1 - x0); } function sy(e) { return y0 - Math.min(e, 1) * (y0 - y1); }
+      var best = 1, bv = 9; for (var q = 1; q <= 15; q++) { if (testErr(q) < bv) { bv = testErr(q); best = q; } }
+      x.fillStyle = "rgba(18,169,123,.20)"; x.fillRect(sx(best - 0.5), y1, sx(best + 0.5) - sx(best - 0.5), y0 - y1);
+      function curve(fn, col) { x.strokeStyle = col; x.lineWidth = 2.6; x.beginPath(); for (var v = 1; v <= 15; v += 0.1) { var px = sx(v), py = sy(fn(v)); v === 1 ? x.moveTo(px, py) : x.lineTo(px, py); } x.stroke(); }
+      curve(trainErr, "#0FB5C4"); curve(testErr, "#EF3E68");
+      x.fillStyle = "#EAEEF7"; x.beginPath(); x.arc(sx(c), sy(testErr(c)), 4.6, 0, 7); x.fill();
+      x.strokeStyle = "rgba(154,166,192,.34)"; x.lineWidth = 1; x.beginPath(); x.moveTo(x0, y0); x.lineTo(x1, y0); x.stroke();
+      x.fillStyle = "#9AA6C0"; x.font = "11px Inter"; x.textAlign = "left"; x.fillText("error", 6, y1 + 8);
+      x.textAlign = "center"; x.fillText("complexity →", (x0 + x1) / 2, y0 + 16);
+      x.textAlign = "left"; x.fillStyle = "#0FB5C4"; x.fillText("train", x1 - 82, y1 + 9); x.fillStyle = "#EF3E68"; x.fillText("test", x1 - 40, y1 + 9);
+      var zone = c < best - 1 ? "underfitting (high bias)" : c > best + 1 ? "overfitting (high variance)" : "the sweet spot";
+      out.className = "w-out " + (Math.abs(c - best) <= 1 ? "true" : "unknown");
+      out.innerHTML = "Complexity <b>" + c + "</b> &mdash; <b>" + zone + "</b>. Training error (teal) keeps falling as the model gets more flexible, but <b>test</b> error (rose) is U-shaped: too simple misses the signal, too complex memorises noise. Aim for the bottom of the rose curve (~" + best + "), not the lowest train error.";
+    }
+    cc.addEventListener("input", draw); window.addEventListener("resize", draw); draw();
+  };
+
+  /* Mean vs median robustness */
+  WIDGETS["mean-median"] = function (host) {
+    host.innerHTML =
+      '<div class="w-row"><span class="w-lab">drag the outlier</span><input class="w-slider" id="wm-o" type="range" min="5" max="60" step="1" value="9"><span class="w-val" id="wm-ov">9</span></div>' +
+      '<canvas class="w-canvas" style="height:170px"></canvas><div class="w-out"></div>';
+    var cv = qs("canvas", host), out = qs(".w-out", host), oo = qs("#wm-o", host), ov = qs("#wm-ov", host);
+    var base = [4, 5, 6, 6, 7, 7, 8, 9];
+    function draw() {
+      var r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2), W = r.width, H = r.height; if (W < 2) return;
+      cv.width = W * dpr; cv.height = H * dpr; var x = cv.getContext("2d"); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
+      var o = +oo.value; ov.textContent = o;
+      var data = base.concat([o]), n = data.length;
+      var mean = data.reduce(function (a, b) { return a + b; }, 0) / n;
+      var srt = data.slice().sort(function (a, b) { return a - b; });
+      var median = n % 2 ? srt[(n - 1) / 2] : (srt[n / 2 - 1] + srt[n / 2]) / 2;
+      var pad = 30, x0 = pad, x1 = W - pad, y = H - 62, xmin = 0, xmax = 65;
+      function sx(v) { return x0 + (v - xmin) / (xmax - xmin) * (x1 - x0); }
+      x.strokeStyle = "rgba(154,166,192,.34)"; x.lineWidth = 2; x.beginPath(); x.moveTo(x0, y); x.lineTo(x1, y); x.stroke();
+      base.forEach(function (v) { x.fillStyle = "rgba(140,133,255,.82)"; x.beginPath(); x.arc(sx(v), y, 5, 0, 7); x.fill(); });
+      x.fillStyle = "#EA9A0B"; x.beginPath(); x.arc(sx(o), y, 6.5, 0, 7); x.fill();
+      function marker(v, col, lab, dy) { x.strokeStyle = col; x.lineWidth = 2.4; x.beginPath(); x.moveTo(sx(v), y - 34); x.lineTo(sx(v), y + 14); x.stroke();
+        x.fillStyle = col; x.font = "600 12px Inter"; x.textAlign = "center"; x.fillText(lab + " " + v.toFixed(1), sx(v), y - 40 + dy); }
+      marker(median, "#12A97B", "median", -16); marker(mean, "#EF3E68", "mean", 0);
+      out.className = "w-out unknown";
+      out.innerHTML = "Outlier at <b>" + o + "</b>: mean = <b style='color:#EF3E68'>" + mean.toFixed(1) + "</b>, median = <b style='color:#12A97B'>" + median.toFixed(1) + "</b>. Drag it right and the <b>mean chases the outlier</b> while the <b>median barely budges</b> &mdash; which is why the median is the <b>robust</b> measure of center for skewed data.";
+    }
+    oo.addEventListener("input", draw); window.addEventListener("resize", draw); draw();
+  };
+
   function setupWidgets() {
     var ws = qsa(".widget"); if (!ws.length) return;
     ws.forEach(function (w) {
@@ -1115,6 +1236,36 @@
     var kick = function () { try { window.dispatchEvent(new Event("resize")); } catch (e) {} };
     requestAnimationFrame(kick); setTimeout(kick, 300);        // re-render once layout/fonts settle
     if (window.ResizeObserver) { try { var ro = new ResizeObserver(kick); qsa(".w-canvas").forEach(function (c) { ro.observe(c); }); } catch (e) {} }
+  }
+
+  /* --------------------- Glossary term tooltips ------------------------- */
+  function setupGlossaryTips() {
+    var terms = qsa(".term.gloss");
+    if (!terms.length) return;
+    function place(el) {
+      el.classList.remove("tip-left", "tip-right", "tip-below");
+      var r = el.getBoundingClientRect(), vw = window.innerWidth, edge = 150;
+      if (r.left < edge) el.classList.add("tip-left");
+      else if (vw - r.right < edge) el.classList.add("tip-right");
+      if (r.top < 140) el.classList.add("tip-below");
+    }
+    terms.forEach(function (el) {
+      el.addEventListener("mouseenter", function () { place(el); });
+      el.addEventListener("focus", function () { place(el); });
+      el.addEventListener("click", function (e) {                 // tap toggle (mobile)
+        e.stopPropagation();
+        var open = el.classList.contains("tip-open");
+        terms.forEach(function (t) { t.classList.remove("tip-open"); });
+        if (!open) { place(el); el.classList.add("tip-open"); }
+      });
+      el.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); el.click(); }
+        if (e.key === "Escape") { el.classList.remove("tip-open"); el.blur(); }
+      });
+    });
+    document.addEventListener("click", function () {
+      terms.forEach(function (t) { t.classList.remove("tip-open"); });
+    });
   }
 
 })();

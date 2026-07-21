@@ -2,7 +2,17 @@
 """builder.py — the static-site engine for Data Science Mentor."""
 import re
 
+try:
+    from glossary import GLOSSARY
+except Exception:
+    GLOSSARY = {}
+
 LETTERS = "ABCDEFGHIJ"
+
+def _defesc(s):
+    """Full plain-text escape for an HTML attribute value (definitions have no entities)."""
+    return (str(s).replace("&", "&amp;").replace('"', "&quot;")
+            .replace("<", "&lt;").replace(">", "&gt;"))
 
 _ENTITY = re.compile(r'&(#\d+;|#x[0-9a-fA-F]+;|[A-Za-z][A-Za-z0-9]*;)')
 
@@ -26,7 +36,14 @@ def inline(text):
     text = esc(text)
     text = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r'<a href="\2">\1</a>', text)
     text = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text)  # non-greedy: tolerates nested *italic* and stray *
-    text = re.sub(r"~([^~]+)~", r'<span class="term">\1</span>', text)
+    def _term_sub(m):
+        t = m.group(1)
+        d = GLOSSARY.get(t.strip().lower())
+        if d:
+            return ('<span class="term gloss" tabindex="0" role="button" aria-label="%s: %s" '
+                    'data-def="%s">%s</span>' % (_defesc(t), _defesc(d), _defesc(d), t))
+        return '<span class="term">%s</span>' % t
+    text = re.sub(r"~([^~]+)~", _term_sub, text)
     text = re.sub(r"(?<![*\w])\*([^*\n]+)\*(?!\w)", r"<em>\1</em>", text)
     def unstash(m):
         return '<code class="inline">%s</code>' % esc(codes[int(m.group(1))])
@@ -186,6 +203,20 @@ def render_sidebar(tracks, active_id, link_base, index_href):
             '<span class="chev">&#9656;</span></summary>'
             '<ul class="nav-lessons">%s</ul></details>'
             % (st, t["num"], open_attr, t["num"], esc(t["title"]), lessons_html))
+    root = index_href[:-len("index.html")] if index_href.endswith("index.html") else ""
+    _RES = [
+        ("labs", "Interactive Labs",
+         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6l-4.5 8A2 2 0 0 0 7.3 20h9.4a2 2 0 0 0 1.8-3L14 9V3"/><path d="M7 15h10"/></svg>'),
+        ("cheatsheets", "Cheatsheets",
+         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>'),
+        ("glossary", "Glossary",
+         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z"/><path d="M8 3v18M12 8h3"/></svg>'),
+    ]
+    res_html = "".join(
+        '<a class="side-res%s" href="%s%s.html">%s<span>%s</span></a>'
+        % ((" active" if active_id == slug else ""), root, slug, icon, label)
+        for slug, label, icon in _RES)
+    parts.append('<nav class="side-reslist"><div class="side-sec">Resources</div>%s</nav>' % res_html)
     parts.append('<div class="side-foot">Built as a masterclass &mdash; learn, practice, '
                  'quiz, and revise. Your progress saves on this device.</div>')
     return '<aside class="sidebar">%s</aside>' % "".join(parts)

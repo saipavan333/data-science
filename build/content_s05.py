@@ -109,6 +109,7 @@ p.append(B.concept(
     "support hour is uncommon when you average 3 tickets. The shapes and the numbers are the "
     "same facts told two ways."))
 
+p.append(B.widget("normal", "Explore the normal distribution", "Drag the mean (&mu;) and standard deviation (&sigma;) and watch the bell curve shift and stretch &mdash; the 68% and 95% bands update live."))
 p.append(B.keypoints([
     "A **distribution** describes how probability is spread over a variable's values: a **PMF** "
     "(bar heights) for discrete, a **PDF** (area under a curve) for continuous.",

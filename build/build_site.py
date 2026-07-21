@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """build_site.py — assemble the whole site from curriculum + content modules."""
-import os, sys, importlib
+import os, sys, importlib, re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.environ.get("SITE_ROOT") or os.path.dirname(HERE)
@@ -8,6 +8,8 @@ sys.path.insert(0, HERE)
 
 import builder as B
 from curriculum import TRACKS
+import hubs
+from glossary import GLOSSARY
 
 CONTENT = {}
 for fname in sorted(os.listdir(HERE)):
@@ -27,6 +29,21 @@ for t in TRACKS:
 
 os.makedirs(os.path.join(ROOT, "lessons"), exist_ok=True)
 
+LAB_INDEX = {}     # track_num -> [ {lesson_id, lesson_title, num, track_title, lab_title, lang}, ... ]
+CHEAT_INDEX = []   # [ {num, lesson_id, title}, ... ]
+
+def _index_resources(t, meta, body):
+    for chunk in body.split('<div class="lab"')[1:]:
+        opentag = chunk[:160]
+        lang = "py" if 'data-lang="py"' in opentag else "sql"
+        m = re.search(r'<span class="lab-title">(.*?)</span>', chunk)
+        title = re.sub(r"<[^>]+>", "", m.group(1)).strip() if m else "Interactive lab"
+        LAB_INDEX.setdefault(t["num"], []).append({
+            "lesson_id": meta["id"], "lesson_title": meta["title"], "num": meta["num"],
+            "track_title": t["title"], "lab_title": title, "lang": lang})
+    if 'class="cs-grid"' in body:
+        CHEAT_INDEX.append({"num": t["num"], "lesson_id": meta["id"], "title": meta["title"]})
+
 for idx, (t, ls) in enumerate(FLAT):
     prev = FLAT[idx - 1][1] if idx > 0 else None
     nxt = FLAT[idx + 1][1] if idx < len(FLAT) - 1 else None
@@ -37,6 +54,7 @@ for idx, (t, ls) in enumerate(FLAT):
         "num": ls.get("num", ""), "dots": ls["_pos"],
     }
     body = CONTENT[ls["id"]] if ls["id"] in CONTENT else B.placeholder_body(meta, t["title"], ls.get("outline"))
+    _index_resources(t, meta, body)
     html = B.build_lesson_page(TRACKS, meta, body,
                                {"id": prev["id"], "title": prev["title"]} if prev else None,
                                {"id": nxt["id"], "title": nxt["title"]} if nxt else None,
@@ -149,4 +167,25 @@ home_html = B.page("Data Science Masterclass — zero to job-ready", home_inner(
 with open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8") as f:
     f.write(home_html)
 
-print("Built %d lesson pages + homepage into %s" % (len(FLAT), ROOT))
+# ---- resource hub pages: glossary, labs, cheatsheets ----
+_HUBS = [
+    ("glossary", "Glossary", hubs.glossary_inner(),
+     "Every key term in the Data Science Masterclass, defined in one line — the same definitions that "
+     "appear as inline tooltips throughout the lessons."),
+    ("labs", "Interactive Labs", hubs.labs_inner(LAB_INDEX),
+     "Every hands-on, in-browser Python and SQL lab in the course, linked to its lesson."),
+    ("cheatsheets", "Cheatsheets", hubs.cheats_inner(CHEAT_INDEX, TRACKS),
+     "Printable one-page references distilling each track to its essentials."),
+]
+for slug, label, inner, desc in _HUBS:
+    sb = B.render_sidebar(TRACKS, slug, "lessons/", "index.html")
+    top = B.topbar('<a href="index.html">Home</a><span class="crumb-sep">&rsaquo;</span>'
+                   '<span class="cur">%s</span>' % label, mark=False)
+    html = B.page("%s — Data Science Masterclass" % label, inner, sb, "",
+                  desc=desc, body_class="hubpage", top=top)
+    with open(os.path.join(ROOT, slug + ".html"), "w", encoding="utf-8") as f:
+        f.write(html)
+
+print("Built %d lesson pages + homepage + 3 hub pages into %s" % (len(FLAT), ROOT))
+print("  labs indexed: %d across %d tracks | cheatsheets: %d"
+      % (sum(len(v) for v in LAB_INDEX.values()), len(LAB_INDEX), len(CHEAT_INDEX)))
