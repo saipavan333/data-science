@@ -256,6 +256,14 @@ def topbar(crumbs_html, lesson_id="", mark=True):
             '</div>' % (crumbs_html, mc, _SEARCH_SVG))
 
 def page(title, inner, sidebar, assets_prefix, desc="", body_class="", top="", lesson_id=""):
+    icons = (
+        '<link rel="icon" type="image/svg+xml" href="%(p)sassets/img/favicon.svg">'
+        '<link rel="icon" type="image/png" sizes="32x32" href="%(p)sassets/img/favicon-32.png">'
+        '<link rel="icon" type="image/png" sizes="16x16" href="%(p)sassets/img/favicon-16.png">'
+        '<link rel="apple-touch-icon" sizes="180x180" href="%(p)sassets/img/apple-touch-icon.png">'
+        '<link rel="icon" href="%(p)sfavicon.ico" sizes="any">'
+        '<meta name="theme-color" content="#0A0E1A">'
+    ) % {"p": assets_prefix}
     return (
 '<!DOCTYPE html>\n<html lang="en">\n<head>\n'
 '<meta charset="utf-8">\n'
@@ -263,12 +271,13 @@ def page(title, inner, sidebar, assets_prefix, desc="", body_class="", top="", l
 '<title>%s</title>\n'
 '<meta name="description" content="%s">\n'
 '%s\n'
+'%s\n'
 '<link rel="stylesheet" href="%sassets/css/styles.css">\n'
 '</head>\n<body class="%s" data-lesson="%s">\n'
 '<div class="readbar" id="readbar"></div>\n<div class="scrim"></div>\n<div class="app">\n%s\n'
 '<div class="main">\n%s\n<main class="content">\n%s\n</main>\n</div>\n</div>\n'
 '%s%s%s\n<script src="%sassets/js/app.js"></script>\n</body>\n</html>\n'
-        % (esc(title), attresc(desc), FONTS, assets_prefix, attresc(body_class),
+        % (esc(title), attresc(desc), icons, FONTS, assets_prefix, attresc(body_class),
            attresc(lesson_id), sidebar, top, inner, CMDK, TOAST, DECK, assets_prefix))
 
 def lesson_nav(prev, nxt):
