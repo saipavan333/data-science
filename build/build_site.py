@@ -167,8 +167,11 @@ home_html = B.page("Data Science Masterclass — zero to job-ready", home_inner(
 with open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8") as f:
     f.write(home_html)
 
-# ---- resource hub pages: glossary, labs, cheatsheets ----
+# ---- resource hub pages: roadmap, glossary, labs, cheatsheets ----
 _HUBS = [
+    ("roadmap", "Path to Mastery", hubs.roadmap_inner(),
+     "Your roadmap from beginner to the best in the industry: the three phases, how to study for "
+     "mastery, a portfolio-project ladder, learning in public, specialization forks, and a weekly cadence."),
     ("glossary", "Glossary", hubs.glossary_inner(),
      "Every key term in the Data Science Masterclass, defined in one line — the same definitions that "
      "appear as inline tooltips throughout the lessons."),
@@ -186,6 +189,6 @@ for slug, label, inner, desc in _HUBS:
     with open(os.path.join(ROOT, slug + ".html"), "w", encoding="utf-8") as f:
         f.write(html)
 
-print("Built %d lesson pages + homepage + 3 hub pages into %s" % (len(FLAT), ROOT))
+print("Built %d lesson pages + homepage + %d hub pages into %s" % (len(FLAT), len(_HUBS), ROOT))
 print("  labs indexed: %d across %d tracks | cheatsheets: %d"
       % (sum(len(v) for v in LAB_INDEX.values()), len(LAB_INDEX), len(CHEAT_INDEX)))
