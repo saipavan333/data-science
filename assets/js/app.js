@@ -6,6 +6,14 @@
 (function () {
   "use strict";
 
+  /* ---- AI course assistant + site extras (byline, page effects, nav, a11y) ---- */
+  (function () {
+    if (window.__gdaWired) return; window.__gdaWired = true;
+    var inL = /\/lessons\//.test(location.pathname), b = inL ? "../assets/" : "assets/";
+    ["css/gd-assistant.css", "css/gd-extras.css"].forEach(function (h) { var l = document.createElement("link"); l.rel = "stylesheet"; l.href = b + h; document.head.appendChild(l); });
+    ["js/gd-extras.js", "js/gd-assistant.js"].forEach(function (src) { var s = document.createElement("script"); s.defer = true; s.src = b + src; document.head.appendChild(s); });
+  })();
+
   var LS_DONE = "dsm.progress.v1";
   var LS_LAST = "dsm.last.v1";
 
