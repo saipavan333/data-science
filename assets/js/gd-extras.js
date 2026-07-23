@@ -99,8 +99,11 @@ function injectByline(){
   if(document.querySelector(".gdx-credit"))return;
   var f=document.createElement("footer"); f.className="gdx-credit";
   f.innerHTML='<span class="gdx-sig">Built by <b>U E Sai Pavan Vamshi Krishna</b></span>';
-  document.body.appendChild(f);
-  alignFooterToContent(f);   /* on sidebar layouts, keep the centered credit under the content column, not the whole viewport */
+  /* Sit in the content column (right after the page content) rather than at body level —
+     otherwise, on a min-height:100vh sidebar layout, the credit floats below a big empty gap. */
+  var host=document.querySelector("main.content, .content, .main")||document.body;
+  host.appendChild(f);
+  if(host===document.body) alignFooterToContent(f);   /* only pad-align when we had to fall back to body */
 }
 /* The footer sits at body level (full viewport width). When a fixed side-nav pushes the
    content into a right-hand column, pad the footer so its centered text lines up with that

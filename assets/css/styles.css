@@ -127,8 +127,10 @@ body.home .hero{border-radius:var(--r-lg);margin-bottom:0}
 body.home .gdx-resume{margin:0 0 16px;border-radius:var(--r-lg)}
 
 .content{max-width:var(--maxread);margin:0 auto;padding:40px 26px 88px}
-body.home .content{max-width:1160px;margin:0 auto;padding:18px 24px 92px}
-@media(max-width:600px){body.home .content{padding:12px 13px 72px}}
+body.home .content{max-width:1160px;margin:0 auto;padding:18px 24px 10px}
+@media(max-width:600px){body.home .content{padding:12px 13px 10px}}
+/* unify the footer: one divider (from .foot), the injected credit sits right under it — no 2nd rule, no gap */
+body.home .gdx-credit{max-width:1100px;margin:2px auto 0;padding:2px 26px 26px;border-top:none}
 
 /* ============================ READING TYPOGRAPHY ======================== */
 .content h2{font-family:var(--disp);font-weight:600;font-size:26px;line-height:1.2;letter-spacing:-.02em;
@@ -401,7 +403,7 @@ table.data tbody tr:hover{background:var(--paper-2)}
 .chip .cn{font-family:var(--mono);font-size:10.5px;font-weight:700;color:#fff;background:var(--indigo);padding:2px 6px;border-radius:6px;flex:none}
 .chip.soon{opacity:.62}.chip.soon .cn{background:var(--faint)}
 .chip.done .cn{background:var(--green)}
-.foot{max-width:1100px;margin:56px auto 0;padding:26px;border-top:1px solid var(--line);color:var(--muted);font-size:13.5px;line-height:1.6}
+.foot{max-width:1100px;margin:52px auto 0;padding:22px 26px 6px;border-top:1px solid var(--line);color:var(--muted);font-size:13.5px;line-height:1.6}
 .foot b{color:var(--text)}
 
 /* ============================ COMMAND PALETTE ========================== */
