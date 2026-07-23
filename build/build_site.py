@@ -27,6 +27,12 @@ for t in TRACKS:
         ls["_pos"] = (i + 1, T)
         FLAT.append((t, ls))
 
+# Derive each track's status from how many of its lessons are actually built,
+# so the homepage/sidebar badges can never go stale (all built -> "ready").
+for t in TRACKS:
+    nready = sum(1 for ls in t["lessons"] if ls["ready"])
+    t["status"] = "ready" if nready == len(t["lessons"]) else ("build" if nready else "soon")
+
 os.makedirs(os.path.join(ROOT, "lessons"), exist_ok=True)
 
 LAB_INDEX = {}     # track_num -> [ {lesson_id, lesson_title, num, track_title, lab_title, lang}, ... ]
