@@ -119,17 +119,16 @@ img{max-width:100%}
 .tb-btn .kbd{font-family:var(--mono);font-size:10px;color:var(--faint)}
 .tb-btn.done{background:var(--green-bg);border-color:transparent;color:#0B7A58}
 .menu-btn{display:none}
-/* Home: float the bar transparently over the dark hero — no white band, no redundant "Home" crumb */
-body.home .topbar{position:absolute;left:0;right:0;top:0;background:transparent;backdrop-filter:none;border-bottom:none}
+/* Home: a clean, readable top bar (hide the redundant "Home" crumb). The hero becomes an
+   inset, fully-rounded dark card so the light chrome and dark hero read as deliberate layers. */
 body.home .topbar .crumbs{display:none}
-body.home .tb-btn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);color:#E7EBF5}
-body.home .tb-btn:hover{border-color:rgba(255,255,255,.42);color:#fff;box-shadow:none}
-body.home .tb-btn .kbd{color:rgba(255,255,255,.55)}
-body.home .menu-btn{color:#EAEEF7}
-body.home .hero{padding-top:78px}
+body.home .hero{border-radius:var(--r-lg);margin-bottom:0}
+/* the injected "resume" banner (gd-extras) sits as a light card above the hero — align + soften it */
+body.home .gdx-resume{margin:0 0 16px;border-radius:var(--r-lg)}
 
 .content{max-width:var(--maxread);margin:0 auto;padding:40px 26px 88px}
-body.home .content{max-width:none;padding:0 0 90px}
+body.home .content{max-width:1160px;margin:0 auto;padding:18px 24px 92px}
+@media(max-width:600px){body.home .content{padding:12px 13px 72px}}
 
 /* ============================ READING TYPOGRAPHY ======================== */
 .content h2{font-family:var(--disp);font-weight:600;font-size:26px;line-height:1.2;letter-spacing:-.02em;
