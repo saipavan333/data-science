@@ -173,8 +173,11 @@ home_html = B.page("Data Science Masterclass — zero to job-ready", home_inner(
 with open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8") as f:
     f.write(home_html)
 
-# ---- resource hub pages: roadmap, glossary, labs, cheatsheets ----
+# ---- resource hub pages: progress, roadmap, glossary, labs, cheatsheets ----
 _HUBS = [
+    ("progress", "My Progress", hubs.progress_inner(TRACKS),
+     "Track your completion across all 107 lessons: an overall ring, per-track bars, and a lesson "
+     "heatmap — all saved on this device as you mark lessons done."),
     ("roadmap", "Path to Mastery", hubs.roadmap_inner(),
      "Your roadmap from beginner to the best in the industry: the three phases, how to study for "
      "mastery, a portfolio-project ladder, learning in public, specialization forks, and a weekly cadence."),

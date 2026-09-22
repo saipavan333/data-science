@@ -95,6 +95,7 @@ p.append(B.concept(
  "life you only get the *one* sample, but the formula hands you the standard error anyway, which "
  "is the whole point: you can quantify your uncertainty from a single sample."))
 
+p.append(B.widget("lln", "The law of large numbers", "Slide the number of dice rolls and watch the running average swing wildly at first, then settle onto the true mean of 3.5."))
 p.append(B.keypoints([
  "A ~parameter~ (&mu;, &sigma;) describes the population and is fixed but unknown; a ~statistic~ "
  "(x&#772;, s) is computed from a sample and varies.",

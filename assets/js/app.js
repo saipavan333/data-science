@@ -45,6 +45,7 @@
     setupLabs();
     setupWidgets();
     setupGlossaryTips();
+    setupDashboard();
     window.scrollTo(0, 0);
   });
 
@@ -1233,6 +1234,62 @@
     oo.addEventListener("input", draw); window.addEventListener("resize", draw); draw();
   };
 
+  /* Gradient descent — learning-rate intuition */
+  WIDGETS["gradient-descent"] = function (host) {
+    host.innerHTML =
+      '<div class="w-row"><span class="w-lab">learning rate</span><input class="w-slider" id="wg-lr" type="range" min="0.05" max="1.05" step="0.01" value="0.30"><span class="w-val" id="wg-lrv">0.30</span></div>' +
+      '<canvas class="w-canvas" style="height:250px"></canvas><div class="w-out"></div>';
+    var cv = qs("canvas", host), out = qs(".w-out", host), lr = qs("#wg-lr", host), lrv = qs("#wg-lrv", host);
+    function draw() {
+      var r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2), W = r.width, H = r.height; if (W < 2) return;
+      cv.width = W * dpr; cv.height = H * dpr; var x = cv.getContext("2d"); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
+      var a = +lr.value; lrv.textContent = a.toFixed(2);
+      var padB = 22, padT = 14, x0 = 16, x1 = W - 16, y0 = H - padB, y1 = padT, xmin = -5, xmax = 5, ymax = 25;
+      function sx(v) { return x0 + (v - xmin) / (xmax - xmin) * (x1 - x0); }
+      function sy(f) { return y0 - Math.min(f, ymax) / ymax * (y0 - y1); }
+      x.strokeStyle = "rgba(154,166,192,.5)"; x.lineWidth = 2; x.beginPath();
+      for (var v = xmin; v <= xmax; v += 0.1) { var px = sx(v), py = sy(v * v); v === xmin ? x.moveTo(px, py) : x.lineTo(px, py); } x.stroke();
+      var xn = -4, pts = [[xn, xn * xn]], diverged = false;
+      for (var i = 0; i < 40; i++) { xn = xn - a * 2 * xn; if (Math.abs(xn) > 6) { diverged = true; break; } pts.push([xn, xn * xn]); if (Math.abs(xn) < 0.02) break; }
+      x.strokeStyle = "#EF3E68"; x.lineWidth = 1.6; x.beginPath();
+      pts.forEach(function (p, i) { var px = sx(p[0]), py = sy(Math.min(p[1], ymax)); i === 0 ? x.moveTo(px, py) : x.lineTo(px, py); }); x.stroke();
+      pts.forEach(function (p) { x.fillStyle = "rgba(239,62,104,.85)"; x.beginPath(); x.arc(sx(p[0]), sy(Math.min(p[1], ymax)), 3.2, 0, 7); x.fill(); });
+      var last = pts[pts.length - 1]; x.fillStyle = "#EAEEF7"; x.beginPath(); x.arc(sx(last[0]), sy(Math.min(last[1], ymax)), 5.5, 0, 7); x.fill();
+      var steps = pts.length - 1, atMin = Math.abs(last[0]) < 0.15;
+      if (diverged) { out.className = "w-out false"; out.innerHTML = "learning rate <b>" + a.toFixed(2) + "</b>: <b>diverged</b> &mdash; too big a step overshoots the minimum and flies off. Lower it."; }
+      else if (atMin) { out.className = "w-out true"; out.innerHTML = "learning rate <b>" + a.toFixed(2) + "</b>: reached the minimum in <b>" + steps + "</b> steps. " + (a > 0.5 ? "It <b>overshoots and zig-zags</b> in &mdash; still converges below 1.0." : "A smooth, steady descent."); }
+      else { out.className = "w-out unknown"; out.innerHTML = a >= 0.9 ? ("learning rate <b>" + a.toFixed(2) + "</b>: <b>bouncing</b> without settling &mdash; too high.") : ("learning rate <b>" + a.toFixed(2) + "</b>: barely moving after " + steps + " steps &mdash; <b>too small</b>, painfully slow."); }
+    }
+    lr.addEventListener("input", draw); window.addEventListener("resize", draw); draw();
+  };
+
+  /* Law of large numbers — running average of dice rolls */
+  WIDGETS["lln"] = function (host) {
+    host.innerHTML =
+      '<div class="w-row"><span class="w-lab">number of dice rolls</span><input class="w-slider" id="wl-n" type="range" min="10" max="3000" step="10" value="30"><span class="w-val" id="wl-nv">30</span></div>' +
+      '<canvas class="w-canvas" style="height:230px"></canvas><div class="w-out"></div>';
+    var cv = qs("canvas", host), out = qs(".w-out", host), nn = qs("#wl-n", host), nv = qs("#wl-nv", host);
+    var seq = [], s = 99991;
+    for (var i = 0; i < 3000; i++) { s = (s * 1103515245 + 12345) & 0x7fffffff; seq.push(1 + Math.floor(s / 0x7fffffff * 6)); }
+    function draw() {
+      var r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2), W = r.width, H = r.height; if (W < 2) return;
+      cv.width = W * dpr; cv.height = H * dpr; var x = cv.getContext("2d"); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
+      var n = +nn.value; nv.textContent = n;
+      var padL = 30, padR = 12, padB = 20, padT = 12, x0 = padL, x1 = W - padR, y0 = H - padB, y1 = padT;
+      function sx(i) { return x0 + (n < 2 ? 0 : i / (n - 1)) * (x1 - x0); }
+      function sy(v) { return y0 - (v - 1) / 5 * (y0 - y1); }
+      x.strokeStyle = "#0FB5C4"; x.setLineDash([5, 4]); x.lineWidth = 1.6; x.beginPath(); x.moveTo(x0, sy(3.5)); x.lineTo(x1, sy(3.5)); x.stroke(); x.setLineDash([]);
+      x.fillStyle = "#0FB5C4"; x.font = "11px Inter"; x.textAlign = "left"; x.fillText("true mean 3.5", x0 + 4, sy(3.5) - 5);
+      var sum = 0; x.strokeStyle = "#8983FF"; x.lineWidth = 2.2; x.beginPath();
+      for (var i = 0; i < n; i++) { sum += seq[i]; var avg = sum / (i + 1); var px = sx(i), py = sy(avg); i === 0 ? x.moveTo(px, py) : x.lineTo(px, py); } x.stroke();
+      var finalAvg = sum / n;
+      x.fillStyle = "#9AA6C0"; x.font = "11px Inter"; x.textAlign = "right"; [1, 3.5, 6].forEach(function (v) { x.fillText(String(v), x0 - 4, sy(v) + 3); });
+      out.className = "w-out " + (Math.abs(finalAvg - 3.5) < 0.15 ? "true" : "unknown");
+      out.innerHTML = "After <b>" + n + "</b> rolls the average is <b>" + finalAvg.toFixed(2) + "</b>. Few rolls swing wildly; slide toward thousands and it <b>settles onto the true mean of 3.5</b> &mdash; the <b>law of large numbers</b>.";
+    }
+    nn.addEventListener("input", draw); window.addEventListener("resize", draw); draw();
+  };
+
   function setupWidgets() {
     var ws = qsa(".widget"); if (!ws.length) return;
     ws.forEach(function (w) {
@@ -1274,6 +1331,38 @@
     document.addEventListener("click", function () {
       terms.forEach(function (t) { t.classList.remove("tip-open"); });
     });
+  }
+
+  /* --------------------- Progress dashboard page ----------------------- */
+  function setupDashboard() {
+    var dash = qs("#dashboard"); if (!dash) return;
+    var done = getDone();
+    var cells = qsa(".dash-cell", dash), total = cells.length, ndone = 0;
+    cells.forEach(function (c) { if (done.has(c.dataset.lid)) { c.classList.add("done"); ndone++; } });
+    var pct = total ? ndone / total : 0, circ = 326.7;
+    var fg = qs("#dash-ring-fg"); if (fg) fg.style.strokeDashoffset = (circ * (1 - pct)).toFixed(1);
+    var pctEl = qs("#dash-pct"); if (pctEl) pctEl.textContent = Math.round(pct * 100) + "%";
+    var dn = qs("#dash-done"); if (dn) dn.textContent = ndone;
+    qsa(".dash-track", dash).forEach(function (tr) {
+      var tc = qsa(".dash-cell", tr);
+      var td = tc.filter(function (c) { return done.has(c.dataset.lid); }).length;
+      var tot = tc.length;
+      var fill = qs(".dash-fill", tr); if (fill) fill.style.width = (tot ? td / tot * 100 : 0) + "%";
+      var cnt = qs(".dash-tcount", tr); if (cnt) cnt.textContent = td + " / " + tot;
+      if (tot && td === tot) tr.classList.add("dash-complete");
+    });
+    var next = null;
+    for (var i = 0; i < cells.length; i++) { if (!done.has(cells[i].dataset.lid)) { next = cells[i]; break; } }
+    var wrap = qs("#dash-nextwrap"), empty = qs("#dash-empty");
+    if (ndone === 0) { if (empty) empty.style.display = ""; if (wrap) wrap.style.display = "none"; return; }
+    if (empty) empty.style.display = "none";
+    if (next && wrap) {
+      wrap.style.display = "";
+      var a = qs("#dash-next", wrap); a.href = next.getAttribute("href"); a.textContent = next.getAttribute("title");
+    } else if (wrap) {
+      wrap.innerHTML = '<b style="color:var(--green)">✓ All ' + total + ' lessons complete — you did it.</b>';
+      wrap.style.display = "";
+    }
   }
 
 })();

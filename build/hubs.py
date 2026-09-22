@@ -278,3 +278,42 @@ def roadmap_inner():
 
     return ('<div class="hub road-page">%s%s%s%s%s%s%s%s%s</div>'
             % (head, phases_sec, study_sec, proj_sec, public_sec, fork_sec, cadence_sec, habit_sec, charge))
+
+
+# ----------------------------------------------------------- Progress dashboard
+def progress_inner(tracks):
+    total = sum(len(t["lessons"]) for t in tracks)
+    extra = (
+        '<div class="dash-top">'
+        '<div class="dash-ring"><svg viewBox="0 0 120 120" aria-hidden="true">'
+        '<circle class="dash-ring-bg" cx="60" cy="60" r="52"/>'
+        '<circle class="dash-ring-fg" id="dash-ring-fg" cx="60" cy="60" r="52" '
+        'stroke-dasharray="326.7" stroke-dashoffset="326.7" transform="rotate(-90 60 60)"/></svg>'
+        '<div class="dash-ring-tx"><b id="dash-pct">0%</b><span>complete</span></div></div>'
+        '<div class="dash-summary">'
+        '<div class="dash-big"><b id="dash-done">0</b> <span>of ' + str(total) + ' lessons done</span></div>'
+        '<div class="dash-nextwrap" id="dash-nextwrap" style="display:none">Next up: '
+        '<a id="dash-next" class="dash-next" href="#">&mdash;</a></div>'
+        '<div class="dash-empty" id="dash-empty">No lessons marked complete yet &mdash; open a lesson and '
+        'hit <b>Mark complete</b> to start filling this in.</div>'
+        '</div></div>')
+    head = _hub_head(
+        "Resource &middot; Your progress", "My Progress",
+        "Everything you&rsquo;ve completed, at a glance &mdash; saved on this device as you mark lessons "
+        "done. Each square is a lesson; fill them all in and you&rsquo;re job-ready.", extra)
+
+    secs = []
+    for t in tracks:
+        cells = "".join(
+            '<a class="dash-cell" data-lid="{id}" href="lessons/{id}.html" title="{num} &middot; {ttl}"></a>'
+            .format(id=l["id"], num=l.get("num", ""), ttl=B.esc(l["title"]).replace('"', "&quot;"))
+            for l in t["lessons"])
+        n = len(t["lessons"])
+        secs.append(
+            '<section class="dash-track" data-track="{num}"><div class="dash-trk-h">'
+            '<span class="hub-tnum">{num}</span><span class="dash-trk-name">{name}</span>'
+            '<span class="dash-tcount" data-total="{n}">0 / {n}</span></div>'
+            '<div class="dash-bar"><div class="dash-fill"></div></div>'
+            '<div class="dash-cells">{cells}</div></section>'
+            .format(num=t["num"], name=B.esc(t["title"]), n=n, cells=cells))
+    return '<div class="hub dash-page" id="dashboard">' + head + "".join(secs) + '</div>'

@@ -749,3 +749,35 @@ body.hubpage .content{max-width:1000px;padding:34px 30px 90px}
 .road-charge p b{color:#fff;font-weight:600}
 .charge-final{font-family:var(--disp);font-size:17px!important;font-weight:500;color:#fff!important;
   border-left:3px solid var(--teal);padding-left:16px;margin-top:20px!important}
+
+/* ============================ PROGRESS DASHBOARD ======================== */
+.dash-top{display:flex;align-items:center;gap:28px;flex-wrap:wrap;margin:6px 0 8px;padding:22px 24px;
+  background:var(--paper);border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh-1)}
+.dash-ring{position:relative;width:120px;height:120px;flex:none}
+.dash-ring svg{width:120px;height:120px}
+.dash-ring-bg{fill:none;stroke:var(--paper-3);stroke-width:11}
+.dash-ring-fg{fill:none;stroke:url(#dashgrad);stroke:var(--indigo);stroke-width:11;stroke-linecap:round;
+  transition:stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1)}
+.dash-ring-tx{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+.dash-ring-tx b{font-family:var(--disp);font-size:26px;font-weight:700;color:var(--text);line-height:1}
+.dash-ring-tx span{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);font-weight:600}
+.dash-summary{flex:1;min-width:220px}
+.dash-big{font-size:15px;color:var(--muted)}
+.dash-big b{font-family:var(--disp);font-size:34px;font-weight:700;color:var(--text);margin-right:6px}
+.dash-nextwrap{margin-top:12px;font-size:14px;color:var(--muted)}
+.dash-next{font-weight:600;color:var(--indigo-2);border-bottom:1px solid rgba(91,84,240,.35)}
+.dash-empty{margin-top:12px;font-size:13.5px;color:var(--faint);line-height:1.5;max-width:60ch}
+.dash-track{margin:16px 0 0;padding:15px 18px;background:var(--paper);border:1px solid var(--line);border-radius:15px}
+.dash-track.dash-complete{border-color:#B8E8D3;background:linear-gradient(180deg,var(--green-bg),var(--paper) 60%)}
+.dash-trk-h{display:flex;align-items:center;gap:11px;margin-bottom:10px}
+.dash-trk-name{flex:1;font-family:var(--disp);font-weight:600;font-size:15px;color:var(--text)}
+.dash-tcount{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--faint)}
+.dash-complete .dash-tcount{color:#0B7A58}
+.dash-bar{height:6px;border-radius:6px;background:var(--paper-3);overflow:hidden;margin-bottom:12px}
+.dash-fill{height:100%;width:0;border-radius:6px;background:var(--grad);transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.dash-cells{display:flex;flex-wrap:wrap;gap:7px}
+.dash-cell{width:20px;height:20px;border-radius:6px;background:var(--paper-3);border:1px solid var(--line);
+  transition:.14s;position:relative}
+.dash-cell:hover{transform:translateY(-2px) scale(1.08);border-color:var(--indigo);z-index:2}
+.dash-cell.done{background:var(--grad);border-color:transparent;box-shadow:0 2px 8px rgba(91,84,240,.3)}
+@media(max-width:600px){.dash-cell{width:17px;height:17px}.dash-top{gap:18px}}

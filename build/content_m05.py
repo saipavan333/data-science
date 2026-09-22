@@ -87,6 +87,7 @@ p.append(B.pylab(
  explain="A small learning rate with many trees is the reliable recipe &mdash; steady gains, less "
          "overfitting than a fast learner."))
 
+p.append(B.widget("gradient-descent", "Learning rate: the size of each step", "Slide the learning rate: too small crawls, just right descends smoothly, too big overshoots and diverges &mdash; the core knob behind boosting."))
 p.append(B.keypoints([
  "~Gradient boosting~ builds trees **sequentially**, each new one trained to correct the ~residuals~ "
  "(errors) the ensemble still makes.",

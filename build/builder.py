@@ -205,6 +205,8 @@ def render_sidebar(tracks, active_id, link_base, index_href):
             % (st, t["num"], open_attr, t["num"], esc(t["title"]), lessons_html))
     root = index_href[:-len("index.html")] if index_href.endswith("index.html") else ""
     _RES = [
+        ("progress", "My Progress",
+         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg>'),
         ("roadmap", "Path to Mastery",
          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>'),
         ("labs", "Interactive Labs",
